@@ -9,7 +9,8 @@
 <script id="jsmd" type="text/jsmd">
 %% meta
 {
-  "title": "Output Handling"
+  "title": "Output Handling",
+  "lastExport": "2018-03-02T17:42:21.236Z"
 }
 
 %% md
@@ -62,7 +63,7 @@ This method may return any of the following:
 
 In the example below, a custom class, `GeoLocation`, is used to represent a
 geographic location by latitude and longitude. When rendering the output, the
-Google Maps Static Image API is used to display a thumbnail map for the
+Open Street Map API is used to display a thumbnail map for the
 location.
 
 %% js
@@ -74,7 +75,7 @@ var GeoLocation = class GeoLocation {
 
   render() {
     // return a string containing HTML
-    return '<img src="https://maps.googleapis.com/maps/api/staticmap?center=' + this.lat + ',' + this.lon + '&zoom=17&size=600x300&maptype=roadmap"/>'
+    return '<img src="http://staticmap.openstreetmap.de/staticmap.php?center=' + this.lat + ',' + this.lon + '&zoom=17&size=600x300&maptype=mapnik"/>'
   }
 }
 
@@ -109,7 +110,7 @@ const GeoLocationOutputHandler = {
     render: function(value) {
         // return a HTMLElement, as created by document.createElement
         let img = document.createElement('img')
-        img.src = 'https://maps.googleapis.com/maps/api/staticmap?center=' + value.lat + ',' + value.lon + '&zoom=17&size=600x300&maptype=roadmap'
+        img.src = 'http://staticmap.openstreetmap.de/staticmap.php?center=' + value.lat + ',' + value.lon + '&zoom=17&size=600x300&maptype=mapnik'
         return img
 
         // TODO: Add a React component example
