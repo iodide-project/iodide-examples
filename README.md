@@ -10,7 +10,7 @@ When you have something you want to share, submit a PR to this repo. Before subm
 
 # Suggestions for top-notch notebooks
 
-Iodide is intended to be a low-friction way to communicate complex ideas that require computation, visualization, and/or interaction in order to be explained fully. High-quality notebooks will focus on this *communication* dimension, and will be designed to explain an idea to a reader. A [literate programming](https://en.wikipedia.org/wiki/Literate_programming) stye is strongly encouraged --you should aim to have a narrative arc, and to tell a story to your reader; write prose in addition to code.
+Iodide is intended to be a low-friction way to communicate complex ideas that require computation, visualization, and/or interaction in order to be explained fully. High-quality notebooks will focus on this *communication* dimension, and will be designed to explain an idea to a reader. A [literate programming](https://en.wikipedia.org/wiki/Literate_programming) style is strongly encouraged --you should aim to have a narrative arc, and to tell a story to your reader; write prose in addition to code.
 
 "Data journalism" provides some of the very best sources of inspiration. Take a look at sites like www.fivethirtyeight.com, or the mix of visualization and explanation in things like this [interactive piece from the New York Times](https://www.nytimes.com/interactive/2017/11/28/upshot/what-the-tax-bill-would-look-like-for-25000-middle-class-families.html).
 
