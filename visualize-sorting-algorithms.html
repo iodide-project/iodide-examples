@@ -1,45 +1,69 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="UTF-8">
-  <title>Visualize Sorting Algorithms - iodide</title>
-  <link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+<meta charset="UTF-8">
+<title>Visualize Sorting Algorithms - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
 </head>
-
 <body>
-  <script id="jsmd" type="text/jsmd">
+<script id="jsmd" type="text/jsmd">
 %% meta
 {
   "title": "Visualize Sorting Algorithms",
-  "lastSaved": "2018-03-03T17:10:46.472Z",
-  "lastExport": "2018-03-03T17:10:58.051Z"
+  "lastSaved": "2018-03-06T04:50:15.214Z",
+  "lastExport": "2018-03-06T04:50:18.673Z"
 }
 
 %% md
-# Visualize Sorting Algorithms
-
-<div id="graphs">
-  <div class="graph1">
-    <b>Selection Sort</b>
-    <div id="selection-sort"></div>
+ # Visualize Sorting Algorithms
+ 
+  <div id="buttons">
+     <button id="button" onClick="reset()">Reset</button>
+     <button id="button" onClick="sort()">Sort</button>
   </div>
-  <div class="graph2">
-    <b>Bubble Sort</b>
-    <div id="bubble-sort"></div>
+    
+  <div id="graphs">
+    <div class="graph1">
+      <b>Selection Sort</b>
+      <div id="selection-sort"></div>
+    </div>
+    <div class="graph2">
+      <b>Bubble Sort</b>
+      <div id="bubble-sort"></div>
+    </div>
+    <div class="graph3">
+      <b>Insertion Sort</b>
+      <div id="insertion-sort"></div>
+    </div>  
   </div>
-  <div class="graph3">
-    <b>Insertion Sort</b>
-    <div id="insertion-sort"></div>
-  </div>  
-</div>
 
 %% css
-#graphs {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-}
+ #graphs {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    #buttons {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    #button {
+      border: none;
+      background-color: black;
+      color: white;
+      width: 64px;
+      border-radius: 9px;
+      margin: 0 3px;
+      transition: all 0.5s linear;  
+    }
+    
+    #button:hover{ 
+      background-color: #00aacc; 
+    }
+    
+    #button:disabled {
+      background-color: #b9b9b9; 
+    }
 
 %% resource
 https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.2/d3.js
@@ -47,111 +71,111 @@ https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.js
 
 %% js
 var w = 300,
-    h = 200,
-    size = 100,
-    speed = 50,
-    data,
-    scale,
-    padding = 2,
-    timer,
-    states = { default: 0, finished: 1, current: 2, compare:3, minimum: 4},
-    colors = ['black', 'green', 'yellow','orange','red'],
-    svg = {};
+      h = 200,
+      size = 100,
+      speed = 50,
+      data,
+      scale,
+      padding = 2,
+      timer,
+      states = { default: 0, finished: 1, current: 2, compare:3, minimum: 4},
+      colors = ['black', 'green', 'yellow','orange','red'],
+      svg = {};
 
 %% js
-function setRandomData(size = 20){
-  data = [];
-  for(var i = 0; i < size; i++){
-    data[i] = {
-      num: Math.random()*size*2,
-      state: states.default
+function setRandomData(size = 20) {
+    data = [];
+    for (var i = 0; i < size; i++) {
+        data[i] = {
+            num: Math.random() * size * 2,
+            state: states.default
+        }
     }
-  }
-  
-  scale = d3.scaleLinear()
-  			.domain([
-    			0,
-    			d3.max(data, (d) =>{
-                  return d.num
-                })
-  			])
-  			.range([0,h])
+
+    scale = d3.scaleLinear()
+        .domain([
+            0,
+            d3.max(data, (d) => {
+                return d.num
+            })
+        ])
+        .range([0, h])
 }
 
 %% js
-function setBars(ds, sortingType){
-  document.getElementById(`${sortingType}`).innerHTML = "";
-  svg[`${sortingType}`] = d3.select(`div#${sortingType}`)
-    	  .append('svg')
-    	  .attr("style", "outline: thin solid #dcdcdc") 
-  		  .attr('width', w-padding)
-  		  .attr('height', h)
-	
-  var bars = {};
-  bars = svg[`${sortingType}`].selectAll('rect')
-  				 .data(ds)
-  				 .enter()
-  				 .append('rect');
-  				 
-  
-  bars.attr('x', (d, i) => {
-    return i * (w / ds.length);
-  });
+function setBars(ds, sortingType) {
+    document.getElementById(`${sortingType}`).innerHTML = "";
+    svg[`${sortingType}`] = d3.select(`div#${sortingType}`)
+        .append('svg')
+        .attr("style", "outline: thin solid #dcdcdc")
+        .attr('width', w - padding)
+        .attr('height', h)
 
-  bars.attr('y', (d, i) => {
-    return h - scale(d.num);
-  });
+    var bars = {};
+    bars = svg[`${sortingType}`].selectAll('rect')
+        .data(ds)
+        .enter()
+        .append('rect');
 
-  bars.attr('width', function(d, i) {
-    return (w / ds.length) - padding;
-  });
 
-  bars.attr('height', function(d, i) {
-    return scale(d.num);
-  });
+    bars.attr('x', (d, i) => {
+        return i * (w / ds.length);
+    });
 
-  bars.attr('fill', function(d, i) {
-    return colors[d.state];
-  });  		  	
+    bars.attr('y', (d, i) => {
+        return h - scale(d.num);
+    });
+
+    bars.attr('width', function(d, i) {
+        return (w / ds.length) - padding;
+    });
+
+    bars.attr('height', function(d, i) {
+        return scale(d.num);
+    });
+
+    bars.attr('fill', function(d, i) {
+        return colors[d.state];
+    });
 }
 
 %% js
-function redrawBars(ds, speed, sortingType){
-  var bars = {};
-  bars = svg[`${sortingType}`].selectAll('rect')
-  				 .data(ds)
-  				 .transition()
-  				 .duration(speed/2)
-  
-  bars.attr('y', (d, i) => {
-    return h - scale(d.num);
-  });
+function redrawBars(ds, speed, sortingType) {
+    var bars = {};
+    bars = svg[`${sortingType}`].selectAll('rect')
+        .data(ds)
+        .transition()
+        .duration(speed / 2)
 
-  bars.attr('width', function(d, i) {
-    return (w / ds.length) - padding;
-  });
+    bars.attr('y', (d, i) => {
+        return h - scale(d.num);
+    });
 
-  bars.attr('height', function(d, i) {
-    return scale(d.num);
-  });
+    bars.attr('width', function(d, i) {
+        return (w / ds.length) - padding;
+    });
 
-  bars.attr('fill', function(d, i) {
-    return colors[d.state];
-  });  		  	
+    bars.attr('height', function(d, i) {
+        return scale(d.num);
+    });
+
+    bars.attr('fill', function(d, i) {
+        return colors[d.state];
+    });
 }
 
 %% js
 setRandomData();
-data.num
+data
 
 %% js
-var selectionSortData = _.cloneDeep(data);
-var bubbleSortData = _.cloneDeep(data);
-var insertionSortData = _.cloneDeep(data);
+ var selectionSortData = _.cloneDeep(data);
+ var bubbleSortData = _.cloneDeep(data);
+ var insertionSortData = _.cloneDeep(data);
 
-setBars(selectionSortData,"selection-sort");
-setBars(bubbleSortData,"bubble-sort");
-setBars(insertionSortData,"insertion-sort");
+ setBars(selectionSortData, "selection-sort");
+ setBars(bubbleSortData, "bubble-sort");
+ setBars(insertionSortData, "insertion-sort");
 
 %% js
 function swap(i, j, d) {
@@ -161,128 +185,156 @@ function swap(i, j, d) {
 }
 
 %% js
-var algos = {}
+var algos = {};
 
 %% js
-algos.selection = function(d, speed){
-  var i=0, j, len = d.length, min, InJ =false;
-  selectionSortTimer = setInterval(function(){    
-    if(i< len-1){      
-      d[i].state = states.current;
-      if(!InJ){
-        min = i;
-        j = i+1;
-        InJ = true;
-      }
-      if(j < len){
-        if(d[j-1].state === states.compare){
-          d[j-1].state = states.default;
-        }        
-        d[j].state = states.compare;
-        if(d[j].num < d[min].num){
-          if(min !== i) d[min].state = states.default
-          min = j;
-          d[min].state = states.minimum;
+algos.selection = function(d, speed) {
+    var i = 0,
+        j, len = d.length,
+        min, InJ = false;
+    selectionSortTimer = setInterval(function() {
+        if (i < len - 1) {
+            d[i].state = states.current;
+            if (!InJ) {
+                min = i;
+                j = i + 1;
+                InJ = true;
+            }
+            if (j < len) {
+                if (d[j - 1].state === states.compare) {
+                    d[j - 1].state = states.default;
+                }
+                d[j].state = states.compare;
+                if (d[j].num < d[min].num) {
+                    if (min !== i) d[min].state = states.default
+                    min = j;
+                    d[min].state = states.minimum;
+                }
+                j++;
+            } else {
+                InJ = false;
+                if (min !== i) {
+                    swap(min, i, d);
+                }
+                d[j - 1].state = states.default;
+                d[min].state = states.default;
+                d[i].state = states.finished;
+                i++;
+            }
+
+        } else {
+            d[i].state = states.finished;
+            clearInterval(selectionSortTimer);
         }
-        j++;
-      }else {
-        InJ = false;
-      	if(min !== i){
-        	swap(min, i, d);
-     	}      
-        d[j-1].state = states.default;      
-        d[min].state = states.default;
-        d[i].state = states.finished;
-        i++;  
-      }
-      
-  	}else {
-      d[i].state = states.finished;
-      clearInterval(selectionSortTimer);
-    } 
-    redrawBars(d, speed, "selection-sort");
-  },speed)
+        redrawBars(d, speed, "selection-sort");
+    }, speed)
 }
 
 %% js
 algos.bubble = function(d, speed) {
-  var len = d.length, i = len - 1, j = 0, inJ = false, wait = false;      
-    bubbleSortTimer = setInterval(function() {        
+    var len = d.length,
+        i = len - 1,
+        j = 0,
+        inJ = false,
+        wait = false;
+    document.querySelectorAll("#button").forEach(b => b.disabled = true)
+    bubbleSortTimer = setInterval(function() {
         if (i > 0) {
             if (!inJ) {
                 j = 0;
                 inJ = true;
-            }            
+            }
             if (j < i) {
                 if (!wait) {
                     if (j != 0) {
                         d[j - 1].state = states.default;
-                    }                    
+                    }
                     d[j].state = states.current;
                     d[j + 1].state = states.compare;
                 } else {
                     if (d[j].num > d[j + 1].num) {
                         swap(j, j + 1, d);
-                    }                    
+                    }
                     j++;
-                }                
+                }
                 wait = !wait;
             } else {
                 d[i - 1].state = states.default;
-                d[i].state = states.finished;                
+                d[i].state = states.finished;
                 i--;
                 inJ = false;
-            }            
+            }
         } else {
-            d[0].state = states.finished;            
+            d[0].state = states.finished;
             clearInterval(bubbleSortTimer);
-        }        
+            document.querySelectorAll("#button").forEach(b => b.disabled = false)
+
+        }
         redrawBars(d, speed, "bubble-sort");
-        
+
     }, speed);
 };
 
 %% js
 algos.insertion = function(d, speed) {
-    var len = d.length, i = 1; j = 0; inJ = false;      
-    d[0].state = states.finished;    
-    insertionSortTimer = setInterval(function() {        
+    var len = d.length,
+        i = 1;
+    j = 0;
+    inJ = false;
+    d[0].state = states.finished;
+    insertionSortTimer = setInterval(function() {
         if (i < len) {
             if (!inJ) {
-                d[i].state = states.compare;                
+                d[i].state = states.compare;
                 j = i - 1;
                 inJ = true;
             }
-            
+
             if (j >= 0) {
                 if (d[j].num > d[j + 1].num) {
                     swap(j, j + 1, d);
                 } else {
-                    d[j + 1].state = states.finished;                    
+                    d[j + 1].state = states.finished;
                     i++;
                     inJ = false;
-                }                
+                }
                 j--;
             } else {
-                d[0].state = states.finished;                
+                d[0].state = states.finished;
                 i++;
                 inJ = false;
-            }            
+            }
         } else {
             clearInterval(insertionSortTimer);
-        }        
-         redrawBars(d, speed, "insertion-sort");
-        
+        }
+        redrawBars(d, speed, "insertion-sort");
+
     }, speed);
 };
 
 %% js
-algos["selection"](selectionSortData, 50);
-algos["bubble"](bubbleSortData, 50);
-algos["insertion"](insertionSortData, 50)
-</script>
-  <div id='page'></div>
-  <script src='https://iodide-project.github.io/master/iodide.master.js'></script>
-</body>
+function reset() {
+    setRandomData();
+    selectionSortData = _.cloneDeep(data);
+    bubbleSortData = _.cloneDeep(data);
+    insertionSortData = _.cloneDeep(data);
 
+    setBars(selectionSortData, "selection-sort");
+    setBars(bubbleSortData, "bubble-sort");
+    setBars(insertionSortData, "insertion-sort");
+}
+
+%% js
+function sort() {
+    algos["selection"](selectionSortData, 50);
+    algos["bubble"](bubbleSortData, 50);
+    algos["insertion"](insertionSortData, 50);
+}
+
+%% js
+sort();
+</script>
+<div id='page'></div>
+<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+</body>
 </html>
