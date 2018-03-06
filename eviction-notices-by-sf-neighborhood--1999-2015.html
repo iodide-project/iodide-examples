@@ -3,26 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <title>Eviction Notices by SF Neighborhood, 1999-2015 - iodide</title>
-<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+<link rel="stylesheet" type="text/css" href="iodide.dev.css">
 </head>
 <body>
 <script id="jsmd" type="text/jsmd">
 %% meta
 {
-  "title": "Eviction Notices by SF Neighborhood, 1999-2015"
+  "title": "Eviction Notices by SF Neighborhood, 1999-2015",
+  "lastSaved": "2018-03-06T22:55:07.176Z",
+  "lastExport": "2018-03-06T22:55:09.004Z"
 }
 
 %% md
-<div id="by-neighborhood"></div>
-
-## Eviction Notices
-
-The above visualization provides the rate at which eviction notices have been served in San Francisco, yearly, from 1997 onward.
-
-There are typical legal reasons for eviction notices - a tenant may be behind in rent, or perhaps violating the lease in a way that, to the property owner or manager, merits eviction. In many cases, however, owners pursue legal means to push out residents in order to charge more in rent for a property.
+# Eviction Notices by SF Neighborhood, 1999-2015
 
 %% md
-## Code
+<div id="by-neighborhood"></div>
 
 %% resource
 https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.2/d3.js
@@ -30,7 +26,7 @@ https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.13.0/metricsgraphics.m
 https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.13.0/metricsgraphics.min.css
 
 %% js
-//'by-neighborhood.csv'
+// here is where we're pulling the data - cached on github for now
 getData = function(url) {
   var re = new XMLHttpRequest()
   re.open('GET', url, false)
@@ -39,7 +35,21 @@ getData = function(url) {
 }
 let URL = 'https://gist.githubusercontent.com/hamilton/67d7904af5cd696ec2b12450b69bd657/raw/15d83f7f281c3e5de2ca3359529ef041b47fcbf6/css'
 var data = d3.csvParse(getData(URL))
-data
+
+%% md
+## Motivation
+
+The above visualization provides the rate at which eviction notices have been served in San Francisco, yearly, from 1997 onward. It is no secret that the cost of housing in San Francisco has transformed the city in profound ways. 
+
+The dataset is made available by [DataSF](https://datasf.org/opendata/), the City of San Francisco's data portal.
+
+There are typical legal reasons for eviction notices - a tenant may be behind in rent, or perhaps violating the lease in a way that, to the property owner or manager, merits eviction. In many cases, however, owners pursue legal means to push out residents in order to charge more in rent for a property.
+
+## Articles that inspired this analysis
+
+- [Why S.F. evictions are on the rise](https://www.sfchronicle.com/politics/article/Why-S-F-evictions-are-on-the-rise-6408950.php) (2015)
+- [San Francisco's new pro-tenant rules increased evictions](https://www.bizjournals.com/sanfrancisco/morning_call/2015/07/san-francisco-rent-control-buyout-rules-evictions.html) (2015)
+- [San Francisco evictions continue to rise each year since 2010](http://www.sfexaminer.com/san-francisco-evictions-continue-rise-year-since-2010/) (2016)
 
 %% js
 var strip_punctuation = function(s) {
@@ -74,7 +84,7 @@ function showNeighborhoodEvictions(data) {
       .style('display', 'flex')
       .style('justify-content', 'space-evenly')
       .style('flex-flow', 'row wrap')
-      .style('width', '1000px')
+      .style('width', '900px')
     .style('margin', 'auto')
 
     var test = nord.slice(1,4).map(function(n){
@@ -82,19 +92,19 @@ function showNeighborhoodEvictions(data) {
     });
   
     nord.forEach(function(neighborhood,i){
-        if (c < 24){
+        if (c < 18){
             var n = strip_punctuation(neighborhood)
             var all = neigh.append('div').classed(n, true)
                 .classed('neighborhood', true)
                 .style('margin', 'auto')
-                .style('width', '166px')
+                .style('width', '143px')
                 .style('height', '160px')
 
             MG.data_graphic({
                 title: neighborhood,
                 data: each_neighborhood[neighborhood],
-                width: 175,
-                height:155,
+                width: 155,
+                height:165,
                 max_y:350,
                 mouseover_align:'center',
                 left: i===0 ? 30 : 15,
@@ -106,7 +116,6 @@ function showNeighborhoodEvictions(data) {
                 show_secondary_x_label: false,
                 area:false,
                 linked:true,
-                color:'black',
                 xax_format: function(d){return d3.timeFormat('%Y')(d)},
                 x_rollover_format: '%Y  ',
                 y_rollover_format: function(d) { return d.count + ' notices'},
@@ -125,8 +134,63 @@ function showNeighborhoodEvictions(data) {
 
 %% js
 showNeighborhoodEvictions(data)
+
+%% css
+.mg-y-axis text, .mg-x-axis text {
+  font-size:10px;
+}
+
+.user-markdown h1 {
+  margin-top:50px;
+  text-align:center;
+  font-family: 'Open Sans';
+  font-weight:100;
+  text-transform: uppercase;
+}
+
+.user-markdown h2 {
+  font-weight:900;
+  text-transform:uppercase;
+  margin-top:60px;
+  margin-bottom:30px;
+}
+
+.user-markdown p, .user-markdown li {
+    font-family: 'Georgia', serif;
+  font-size:16px !important;
+  line-height: 1.818;
+}
+
+.user-markdown p {
+  margin-bottom:20px;
+}
+
+.mg-header {
+  font-size:14px;
+  font-style:italic;
+}
+
+.presentation div.user-markdown {
+  width:900px;
+  margin:auto;
+  line-height:1.62em;
+}
+
+div#by-neighborhood {
+  margin-top:40px;
+  margin-bottom:60px;
+}
+
+.presentation {
+  margin-bottom:40px !important;
+}
+
+%% md
+<div style='height:100px' />
+
+%% js
 </script>
 <div id='page'></div>
-<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+<script src='iodide.dev.js'></script>
 </body>
 </html>
