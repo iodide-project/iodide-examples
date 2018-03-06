@@ -1,8 +1,15 @@
 # iodide-examples
-example Iodide notebooks
+### Start here:
+https://iodide-project.github.io/iodide-examples/what-a-web-notebook-looks-like.html
+### Then try:
+- https://iodide-project.github.io/iodide-examples/output-handling.html
+- https://iodide-project.github.io/iodide-examples/visualize-sorting-algorithms.html
+- https://iodide-project.github.io/iodide-examples/eviction-notices-by-sf-neighborhood--1999-2015.html
 
 # Contributing
-Contributions are very welcome -- creating a demo notebook or some documentation is the best way to begin contributing to Iodide!
+__Creating a demo and/or documentation notebookks is the best way to begin contributing to Iodide!__
+
+Contributions are very much dered -- as you can see, we've been focusing so intently on building Iodide itself that we haven't yet created nearly enough high quality demo notebooks. But we really need more notebooks that help us tell the story of what Iodide can do and how it works.
 
 You can get started by visiting https://iodide-project.github.io/master/ -- from there, you can begin working on a notebook, and export it to your local machine when you're happy with it.
 
