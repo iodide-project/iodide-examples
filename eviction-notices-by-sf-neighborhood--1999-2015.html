@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>Eviction Notices by SF Neighborhood, 1999-2015 - iodide</title>
-<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css"></head>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+</head>
 <body>
 <script id="jsmd" type="text/jsmd">
 %% meta
 {
   "title": "Eviction Notices by SF Neighborhood, 1999-2015",
   "lastSaved": "2018-03-06T22:55:07.176Z",
-  "lastExport": "2018-03-06T22:55:09.004Z"
+  "lastExport": "2018-03-06T23:57:48.144Z"
 }
 
 %% md
@@ -38,11 +39,11 @@ var data = d3.csvParse(getData(URL))
 %% md
 ## Motivation
 
-The above visualization provides the rate at which eviction notices have been served in San Francisco, yearly, from 1997 onward. It is no secret that the cost of housing in San Francisco has transformed the city in profound ways. 
+The above visualization demonstrates the volume of eviction notices San Francisco, yearly, from 1997 onward, by neighborhood.
 
 The dataset is made available by [DataSF](https://datasf.org/opendata/), the City of San Francisco's data portal.
 
-There are typical legal reasons for eviction notices - a tenant may be behind in rent, or perhaps violating the lease in a way that, to the property owner or manager, merits eviction. In many cases, however, owners pursue legal means to push out residents in order to charge more in rent for a property.
+There are many legal reasons for eviction notices - a tenant may fall behind in rent, or perhaps has violated their lease in a way that, to the property owner or manager, merits eviction. In many cases, however, owners pursue various legal means to push out tenants to charge more in rent for a property, or to demolish a building to make way for more dense or more upscale housing. It is no secret that housing prices in San Francisco have skyrocketed past what many residents were previously able to pay, and the consequence of this increased demand and unmatched supply often takes the form of evictions.
 
 ## Articles that inspired this analysis
 
@@ -177,7 +178,6 @@ showNeighborhoodEvictions(data)
 
 div#by-neighborhood {
   margin-top:40px;
-  margin-bottom:60px;
 }
 
 .presentation {
@@ -186,8 +186,6 @@ div#by-neighborhood {
 
 %% md
 <div style='height:100px' />
-
-%% js
 </script>
 <div id='page'></div>
 <script src='https://iodide-project.github.io/master/iodide.master.js'></script>
