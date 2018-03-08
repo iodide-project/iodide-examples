@@ -10,8 +10,8 @@
 %% meta
 {
   "title": "Introduction to the DOM and its Manipulation",
-  "lastSaved": "2018-03-08T21:57:14.840Z",
-  "lastExport": "2018-03-08T22:00:30.502Z"
+  "lastSaved": "2018-03-08T22:23:45.564Z",
+  "lastExport": "2018-03-08T22:24:11.678Z"
 }
 
 %% md
@@ -33,7 +33,7 @@ You can read more about the DOM from [Mozilla Web Docs](https://developer.mozill
 
 The DOM comes with a set of associated [APIs](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) through which its properties can be manipulated and configured as required. This enables us to make DOM structures (such as webpages or this notebook) interactive. Using Iodide a user can work directly on the DOM which was not quite possible using other traditional notebooks.
 
-This notebook briefly describes how one can do manipulations on the DOM using Iodide.  
+This notebook briefly describes how one can manipulate the DOM using Iodide.  
 We will try to learn and understand the workings of the DOM by example. To get started, we will make a block using the **div** tag
 
 %% md
@@ -54,7 +54,7 @@ Let's add some CSS to make this look better. We can use Iodide's CSS cell to cha
 }
 
 %% md
-We will now perform a very simple manipulation to the above created element using JavaScript. In order to do any kind of manipulation, we first have to get the object associated with that element from the DOM tree. The browser provides us with a number of [search methods](http://javascript.info/searching-elements-dom) through which an element or a list of elements can be selected. One such method is `getElementById`. 
+We will now perform a very simple manipulation to the above created element using JavaScript. In order to do any kind of manipulation, we first have to get the object associated with that element from the DOM tree. The browser provides us with a number of [search methods](http://javascript.info/searching-elements-dom) through which an element or a list of elements can be selected. One such method is `getElementById`.
 
 %% js
 // Get element from the DOM tree and store a reference
@@ -143,7 +143,7 @@ Let's carry what we have learnt till now to create a chart on the DOM
 </style>
 
 %% md
-Hmm.. what if we could automate the creation of those divs and add more interactivity to it ?
+Hmm... what if we could automate the creation of those divs and add more interactivity to it?
 
 Here comes [D3](https://d3js.org/) into the picture.
 
@@ -197,6 +197,7 @@ d3.select('div#bar-d3-chart')
   .enter()
   .append("div")
   .style("height", (d)=> d + "0px")
+  .text((d) => d)
 
 %% md
 How about we work with some real data now?  
