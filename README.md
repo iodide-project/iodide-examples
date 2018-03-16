@@ -9,7 +9,7 @@ https://iodide-project.github.io/iodide-examples/what-a-web-notebook-looks-like.
 # Contributing
 __Creating a demo and/or documentation notebookks is the best way to begin contributing to Iodide!__
 
-Contributions are very much dered -- as you can see, we've been focusing so intently on building Iodide itself that we haven't yet created nearly enough high quality demo notebooks. But we really need more notebooks that help us tell the story of what Iodide can do and how it works.
+Contributions are very much desired -- as you can see, we've been focusing so intently on building Iodide itself that we haven't yet created nearly enough high quality demo notebooks. But we really need more notebooks that help us tell the story of what Iodide can do and how it works.
 
 You can get started by visiting https://iodide-project.github.io/master/ -- from there, you can begin working on a notebook, and export it to your local machine when you're happy with it.
 
