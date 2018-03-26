@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Introduction to the DOM and its Manipulation - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "Introduction to the DOM and its Manipulation",
+  "lastSaved": "2018-03-08T22:23:45.564Z",
+  "lastExport": "2018-03-08T22:24:11.678Z"
+}
+
+%% md
+# Introduction to the DOM and its Manipulation
+
+The following notebook is a small tutorial on the Document Object Model (DOM) and how it can be manipulated to create various awesome elements on the web.  
+The notebook is aimed at people who are comfortable with at least one programming language and have some basic idea about HTML and CSS.
+
+%% md
+## What is the DOM ?
+
+The backbone of an HTML document is its tags such as `html`, `body`, `div`, `li` etc.
+According to the **Document Object Model (DOM)**, every HTML-tag is an object. A page's content can be accessed by the `document` object which serves as the root node. All the other tags are children of this node. These objects then can be manipulated using a scripting language such as JavaScript. Together, the hierarchy of these objects forms a tree structure popularly known as the DOM tree. 
+
+You can read more about the DOM from [Mozilla Web Docs](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) and [JavaScript.info](https://javascript.info/dom-nodes)
+
+%% md
+## Why should I care about the DOM anyway ? 
+
+The DOM comes with a set of associated [APIs](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) through which its properties can be manipulated and configured as required. This enables us to make DOM structures (such as webpages or this notebook) interactive. Using Iodide a user can work directly on the DOM which was not quite possible using other traditional notebooks.
+
+This notebook briefly describes how one can manipulate the DOM using Iodide.  
+We will try to learn and understand the workings of the DOM by example. To get started, we will make a block using the **div** tag
+
+%% md
+<div id="test">
+  Here we have defined a div tag with an id of test
+</div>
+
+This creates a new node in the DOM tree which can be uniquely identified using the **id** *test*.
+
+Let's add some CSS to make this look better. We can use Iodide's CSS cell to change the CSS of this document.
+
+%% css
+#test {
+  padding: 1em;
+  margin: 1em;
+  width: 100px;
+  background: #bdc3c7
+}
+
+%% md
+We will now perform a very simple manipulation to the above created element using JavaScript. In order to do any kind of manipulation, we first have to get the object associated with that element from the DOM tree. The browser provides us with a number of [search methods](http://javascript.info/searching-elements-dom) through which an element or a list of elements can be selected. One such method is `getElementById`.
+
+%% js
+// Get element from the DOM tree and store a reference
+a = document.getElementById('test')
+// Change background of the selected element
+a.style.background = "#3498db"
+
+%% md
+As you can notice, the background color of the box has changed without the need of re-rendering that cell. We have other functions similar to `getElementById` such as `querySelectorAll`, `querySelector`, `getElementsByTagName` etc. which provide us access to different elements on the DOM tree.
+
+%% md
+How about we make something more interactive now?  
+In the next example we are going to create a collection of boxes and add hover events to them.  
+
+We will write some styling code first. One for the container which we are wrapping around our boxes and the other for the box itself.
+
+%% css
+.container {
+  padding: 2em;
+}
+
+.box {
+  width: 100px;
+  height: 100px;
+  background: #8e44ad;
+  display: inline-block;
+  transition: ease 0.5s
+}
+
+%% md
+<div class="container">
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box"></div>
+</div>
+
+%% md
+Currently, we have a static collection of boxes. To add interactivity, we will have to add functions that run in case of an event occurs. These functions are known as event handlers. An event can be anything such as a mouse click, keypress or even the movement of the cursor. You can read more about events and event handlers from [Mozilla MDN](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events). We will now write the code for event handlers to add hover effect on the boxes. Mouse hover can be decomposed into two events, `mouseover` and `mouseout`.
+
+%% js
+// Get the Node from the DOM Tree
+var boxes = document.querySelectorAll(".box");
+
+var mouseIn = function() {
+	this.style.background = "#34495e" 
+    this.style.transform = "translateY(-10px)"
+};    
+
+var mouseOut = function() {	
+	this.style.background = "#8e44ad"
+	this.style.transform = "translateY(0px)"
+};
+
+// For Each box add an event handler for mouserover and mouseout
+Array.from(boxes).forEach(function(element) {  
+	element.addEventListener('mouseover', mouseIn);
+    element.addEventListener('mouseout', mouseOut);
+});
+
+%% md
+Try hovering over the boxes to see the effect we just created.
+
+Let's carry what we have learnt till now to create a chart on the DOM
+
+%% md
+<div style="display: flex; align-items: flex-end">
+  <div class="bar-chart" style="height: 40px;">4</div>
+  <div class="bar-chart" style="height: 230px;">23</div>
+  <div class="bar-chart" style="height: 150px;">15</div>
+  <div class="bar-chart" style="height: 180px;">18</div>
+  <div class="bar-chart" style="height: 90px;">9</div>
+  <div class="bar-chart" style="height: 350px;">35</div>
+</div>
+<style>
+  .bar-chart {
+    font: 14px sans-serif;
+    background-color: steelblue;
+    padding: 3px 10px;
+    width: 20px;
+    margin: 1px 5px;
+    color: white
+  }
+</style>
+
+%% md
+Hmm... what if we could automate the creation of those divs and add more interactivity to it?
+
+Here comes [D3](https://d3js.org/) into the picture.
+
+
+### What's D3?
+
+D3 stands for **Data-Driven Documents**. D3 is a JS library which helps us to interact with the DOM, based on the data we have. D3 is built on top of common web standards like HTML, CSS, and [SVG](https://developer.mozilla.org/en-US/docs/Web/SVG). But it's more than that; it's a living, breathing thing. Javascript can manipulate the DOM, creating and deleting pieces of it which enables the whole component to be dynamic and interactive. D3 is extensively used for creating customised visualizations and storytelling through data. One can view various visualizations built using D3 at [D3 Gallery](https://github.com/d3/d3/wiki/Gallery)
+
+### Why use D3?
+
+Building GUI for data visualization is verbose as you can see in the above example. D3 uses a functional style which means you can reuse code and add specific functions according to your need without worrying about creating individual elements. D3 also provides an easy way to bind data into our visualization.
+
+### What D3 isn't
+
+Unlike `matplotlib` (a popular charting library for Python) D3 doesn't have prebuilt data visualizations. For instance, there is nothing such as `d3.scatterplot`. D3 aims to be low level and flexible. If you are looking for a library which has prebuilt functions for common visualizations and chart then you should probably avoid D3. There are other libraries such as [Plotly](https://plot.ly/javascript/) which can serve the purpose.
+
+We will quickly import D3 by using Iodide's External Dependency cell. We can put the source link of the libraries which we want to import under this cell which on execution would incorporate the library's associated function to the document.
+
+%% resource
+https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js
+
+%% css
+/* CSS for d3 chart components */
+#bar-d3-chart {
+  display: flex;
+  align-items: flex-end;
+}
+
+#bar-d3-chart > div {
+    font: 14px sans-serif;
+    background-color: steelblue;
+  	padding: 3px 10px;
+    width: 20px;
+    margin: 1px 5px;
+    color: white
+}
+
+%% md
+We will declare another node on the DOM tree on which we can mount our chart later.
+
+%% md
+<div id='bar-d3-chart'></div>
+
+%% md
+Using D3 we first select the node on which we want to mount our chart. Thereafter, we select the child div elements of the chart container. This selection is empty because the container was just added. However, by binding this selection to the array of numbers via the data operator, we can obtain the entering selection—a set of placeholder nodes, one per data element, to which we can append the desired child nodes for each bar. These child nodes then can be styled accordingly.
+
+%% js
+d3.select('div#bar-d3-chart')
+  .selectAll("div")
+  .data([4, 23, 15, 18, 9, 35])
+  .enter()
+  .append("div")
+  .style("height", (d)=> d + "0px")
+  .text((d) => d)
+
+%% md
+How about we work with some real data now?  
+We will use GitHub's API to retrieve the data of all the open source repositories of Mozilla.
+
+%% js
+var data;
+let URL = 'https://api.github.com/orgs/mozilla/repos'
+
+d3.json(URL, function(json) {
+  data = json
+})
+
+%% md
+Let's take a quick peek at our data.  
+Iodide by default provides a paginated tabular view for an array of objects.
+
+%% js
+data
+
+%% md
+The above table contains some inactive or small repositories too. In order to have a better data visualization we would want to remove those repositories from the list. We can deal with this problem by using the `filter` function. The `filter` function iterates over an array and returns only those elements which match a given condition.  
+We will only keep those repositories which have more than 20 forks.
+
+%% js
+data = data.filter(d => d.forks_count > 20)
+
+%% md
+We would now try to plot out various parameters such as forks, stars, issues etc. for different repositories. Using D3 we will create bars, X-axis and Y-axis components and append them on the DOM.  
+Although a little bit more code is involved, the advantage is that we now have full control of the plot, and we can easily add more components and configurations easily.
+
+%% js
+function drawGraph() {
+  var e = document.getElementById("category");
+  var category = e.options[e.selectedIndex].value;
+ // set the dimensions and margins of the graph
+  var margin = {top: 40, right: 20, bottom: 120, left: 40},
+      width = 960 - margin.left - margin.right,
+      height = 600 - margin.top - margin.bottom;
+
+  // define transition
+  var t = d3.transition()
+              .duration(750)
+              .ease(d3.easeQuadOut);
+  
+  // clear Previous graph
+  d3.select("#svg_graph").remove();
+
+  // set the ranges
+
+  // x-axis scale
+  var x = d3.scaleBand()
+            .range([0, width])
+            .domain(data.map(function(d) { return d.name; }))
+            .padding(0.05);
+  // y-axis scale
+  var y = d3.scaleLinear()
+            .range([height, 0])
+            .domain([0, d3.max(data, function(d) { return d[category]; })]);
+
+  // create svg element
+  var svg = d3.select("#chart").append("svg")
+  	.attr("id","svg_graph")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .attr("viewBox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom))
+    .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+  // create x-axis
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).ticks(10))
+        .selectAll("text")	
+          .style("text-anchor", "end")
+          .attr("dx", "-.8em")
+          .attr("dy", ".15em")
+          .attr("transform", "rotate(-65)");
+
+  // create y-axis
+  var yAxis = svg.append("g")
+    .attr("class", "y-axis axis")
+    .call(d3.axisLeft(y).ticks(10, "s"))
+  .append("text")
+    .attr("y", -20)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("Value");
+
+  // create bars
+  var bars = svg.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+    .attr("class", "bar")
+    .attr("x", function(d) { return x(d.name); })
+    .attr("width", x.bandwidth())
+    .attr("y", function(d) { return y(0); })
+      .attr("height", height - y(0))
+      .transition(t)
+    .attr("y", function(d) { return y(d[category]); })
+    .attr("height", function(d) { return height - y(d[category]); })
+    .attr('fill', '#0071b9');
+}
+
+%% css
+/* Adding CSS flavour for select dropdown and chart */
+
+.options select {
+    padding:5px;
+    margin: 0;
+    border-radius:4px;
+    box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+    background: #f8f8f8;
+    color:#888;
+    border:none;
+    outline:none;
+    display: inline-block;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    cursor:pointer;
+    min-width: 250px;
+    text-align: center;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .options select {padding-right:18px}
+}
+
+.options label {position:relative}
+.options label:after {
+    content:'<>';
+    font:11px "Consolas", monospace;
+    color:#aaa;
+    -webkit-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+    -ms-transform:rotate(90deg);
+    transform:rotate(90deg);
+    right:8px; top:2px;
+    padding:0 0 2px;
+    border-bottom:1px solid #ddd;
+    position:absolute;
+    pointer-events:none;
+}
+.options label:before {
+    content:'';
+    right:6px; top:0px;
+    width:20px; height:20px;
+    background:#f8f8f8;
+    position:absolute;
+    pointer-events:none;
+    display:block;
+}
+.options {
+  text-align: center;
+}
+#chart {
+	text-align: center;
+}
+
+%% md
+<div class='options'>
+  <label>
+    <select onchange='drawGraph()' id="category">
+            <option value="" disabled selected style="display:none;">Pick an Option</option>
+            <option value="forks_count">Forks</option>
+      		<option value="watchers">Watchers</option>
+            <option value="stargazers_count">Stars</option>
+      		<option value="size">Size</option>
+            <option value="open_issues">Open Issues</option>
+    </select>
+  </label>
+</div>
+
+<div id="chart"></div>
+</script>
+<div id='page'></div>
+<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+</body>
+</html>
