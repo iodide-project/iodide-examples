@@ -11,21 +11,21 @@
 {
   "title": "Gym Crowdedness",
   "lastSaved": "2018-03-27T03:08:12.605Z",
-  "lastExport": "2018-03-27T03:08:15.379Z"
+  "lastExport": "2018-03-27T03:33:25.605Z"
 }
 
 %% md
 # Exploring the Campus Gym Crowdedness Dataset
 
 ## Purpose
-To explore and analyze the Campus Gym Crowdedness Dataset for correlations between the number of people the campus gym and other features such as temperature and time. 
+The purpose of this notebook is to explore and analyze the Campus Gym Crowdedness Dataset for correlations between the number of people in the campus gym and other features such as temperature and time. 
 
 ## Technologies Used
-- d3.js
+- D3.js
 - plotly.js
 
 ## Data
-Each row in the dataset represents how many people are in the campus gym at a given time. Measurements were taken every 10 minutes at the campus gym over the course of a year. Other feature columns such as temperature and day of week have been added to the dataset.
+Each row in the dataset represents how many people were in the campus gym at a given time. Measurements were taken every 10 minutes at the campus gym over the course of a year. Other feature columns such as temperature and day of week have been added to the dataset.
 
 Source:
 <a href="https://www.kaggle.com/nsrose7224/crowdedness-at-the-campus-gym">Kaggle - Crowdedness at the Campus Gym</a>
@@ -37,7 +37,7 @@ Import d3
 https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.2/d3.js
 
 %% md
-Import the data using d3.csv
+Import the data using D3
 
 %% js
 const URL = "https://gist.githubusercontent.com/jandrewtorres/0e40e6b3368af619a2287c1fa6508483/raw/a0661154081f625e6a74f672dd55db62a9dd8a5a/gym_crowdedness.csv"
@@ -70,7 +70,7 @@ Verify data imported successfully and preview dataset
 data
 
 %% md
-Verify columns has been configured correctly.
+Verify columns has been configured correctly
 
 %% js
 columns
@@ -79,7 +79,7 @@ columns
 ## Wrangle the data and calculate correlation coefficients between features
 
 %% md
-We want to explore the correlations between the different columns. To do so, we will need to calculate the correlation coefficients with the following function, which takes in two columns and returns the computed correlation value between the two columns in the range [-1, 1]
+We want to explore the correlations between the different columns. To do so, we will need to calculate the correlation coefficients with the following function, which accepts two feature columns as parameters and returns their Pearson Correlation Coefficient in the range [-1, 1]
 
 %% js
 /*
@@ -132,14 +132,14 @@ function getPearsonCorrelation(x, y) {
 }
 
 %% md
-Noticed that the columns 'date' and 'timestamp' are continuous values that will not give us meaningful correlations. Let's delete them.
+Notice that the 'date' and 'timestamp' feature columns are continuous and will not give us meaningful correlations. Let's delete them.
 
 %% js
 delete columns['date']
 delete columns['timestamp']
 
 %% md
-Now we are ready to calculate the correlation coefficients for all column pairs
+We are now ready to calculate the correlation coefficients for all column pairs
 
 %% js
 var correlationCoefficients = {}
