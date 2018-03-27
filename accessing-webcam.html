@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Accessing Webcam - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "Accessing Webcam",
+  "lastSaved": "2018-03-27T22:03:40.063Z",
+  "lastExport": "2018-03-27T22:04:20.892Z"
+}
+
+%% md
+# Take a Selfie and Apply Filters Tutorial
+This tutorial will use an Iodide notebook to access your webcam in order to take a selfie, apply filters, and download the photo.
+
+%% md
+In the markdown cell below we will write the html for our selfie application. It will include a video element for the webcam feed, a canvas element to show the selfie, and control buttons to take the selfie and apply filters to the selfie.
+
+%% md
+<div id="container">
+    <video id="video" autoplay></video>
+	<div id="control-panel">
+      <button id="selfie">Take Selfie</button>
+      <div id="filter-panel">
+        <label for="select">Filter: </label>
+        <select id="filter">
+          <option value="none">None</option>
+          <option value="blur">Blur</option>
+          <option value="grayscale">Grayscale</option>
+          <option value="invert">Invert</option>
+          <option value="sepia">Sepia</option>
+        </select>
+      </div>
+  	</div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+%% md
+The CSS cell below provides some styling and layout for our application and some filter classes that we will apply to our selfie.
+
+%% css
+/* layout */
+#container {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  font-size: 24px;
+}
+
+#video {
+  height: 300px;
+}
+
+#control-panel {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+#control-panel button, select {
+  font-size: 24px;
+}
+
+#filter-panel {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content:center;
+  width: 100%;
+}
+
+/* filters */
+.none {
+  -webkit-filter: none;
+  filter: none;
+}
+.blur {
+  -webkit-filter: blur(3px);
+  filter: blur(3px);
+}
+.grayscale {
+  -webkit-filter: grayscale(1);
+  filter: grayscale(1);
+}
+.invert {
+  -webkit-filter: invert(1);
+  filter: invert(1);
+}
+.sepia {
+  -webkit-filter: sepia(1);
+  filter: sepia(1);
+}
+
+%% md
+The javascript cell below creates the actions for our take selfie and filter buttons.
+
+%% js
+// Get all elements we will need
+var controls = document.querySelector('#control-panel')
+var selfieButton = controls.querySelector('button#selfie');
+var filterSelect = controls.querySelector('select#filter');
+var downloadButton = controls.querySelector('button#download');
+var canvas = document.querySelector('#canvas');
+var video = document.querySelector('#video');
+
+// take selfie
+selfieButton.onclick = function() {
+  canvas.className = filterSelect.value;
+  canvas.width = video.getBoundingClientRect().width;
+  canvas.height = video.getBoundingClientRect().height;
+  canvas.getContext('2d').drawImage(video, 0, 0, video.getBoundingClientRect().width, video.getBoundingClientRect().height);
+};
+
+// change css filter on images
+filterSelect.onchange = function() {
+  video.className = filterSelect.value;
+  canvas.className = filterSelect.value;
+};
+
+%% md
+Now start the video feed!
+
+%% js
+// start video
+var video = document.getElementById('video');
+if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+   navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+     video.src = window.URL.createObjectURL(stream);
+     video.play();
+   });
+}
+</script>
+<div id='page'></div>
+<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+</body>
+</html>
