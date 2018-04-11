@@ -10,8 +10,8 @@
 %% meta
 {
   "title": "Visualize Sorting Algorithms",
-  "lastSaved": "2018-04-10T20:05:44.325Z",
-  "lastExport": "2018-04-10T20:06:00.111Z"
+  "lastSaved": "2018-04-11T15:07:20.610Z",
+  "lastExport": "2018-04-11T15:21:59.673Z"
 }
 
 %% md
@@ -87,7 +87,7 @@ function setRandomData(size = 20) {
     data = [];
     for (var i = 0; i < size; i++) {
         data[i] = {
-            num: Math.random() * size * 2,
+            num: Math.random()* size * 2,
             state: states.default
         }
     }
@@ -291,6 +291,9 @@ algos.insertion = function(d, speed) {
     j = 0;
     inJ = false;
     d[0].state = states.finished;
+  	for(var k = 1; k< len;k++){
+      d[k].state = states.default;
+    }
     insertionSortTimer = setInterval(function() {
         if (i < len) {
             if (!inJ) {
