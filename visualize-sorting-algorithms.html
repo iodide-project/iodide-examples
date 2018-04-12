@@ -11,7 +11,7 @@
 {
   "title": "Visualize Sorting Algorithms",
   "lastSaved": "2018-04-11T15:07:20.610Z",
-  "lastExport": "2018-04-11T15:21:59.673Z"
+  "lastExport": "2018-04-12T00:59:32.051Z"
 }
 
 %% md
@@ -238,6 +238,9 @@ algos.bubble = function(d, speed) {
         inJ = false,
         wait = false,
   		flag = false;
+   	for(var k = 0; k<len;k++){
+      d[k].state = states.default;                      
+    }
     document.querySelectorAll("#button").forEach(b => b.disabled = true)
     bubbleSortTimer = setInterval(function() {
         if (i > 0) {
@@ -265,7 +268,7 @@ algos.bubble = function(d, speed) {
                 d[i].state = states.finished;
                 i--;
                 inJ = false;
-               if(!flag) {
+               if(!flag) {   
                  	for(var k = 0; k<i+1;k++){
                       d[k].state = states.finished;                      
                     }
