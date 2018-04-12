@@ -10,12 +10,12 @@
 %% meta
 {
   "title": "Visualize Sorting Algorithms",
-  "lastSaved": "2018-03-06T04:50:15.214Z",
-  "lastExport": "2018-03-06T04:50:18.673Z"
+  "lastSaved": "2018-04-11T15:07:20.610Z",
+  "lastExport": "2018-04-12T00:59:32.051Z"
 }
 
 %% md
- # Visualize Sorting Algorithms
+# Visualize Sorting Algorithms
  
   <div id="buttons">
      <button id="button" onClick="reset()">Reset</button>
@@ -38,7 +38,7 @@
   </div>
 
 %% css
- #graphs {
+#graphs {
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
@@ -87,7 +87,7 @@ function setRandomData(size = 20) {
     data = [];
     for (var i = 0; i < size; i++) {
         data[i] = {
-            num: Math.random() * size * 2,
+            num: Math.random()* size * 2,
             state: states.default
         }
     }
@@ -169,7 +169,7 @@ setRandomData();
 data
 
 %% js
- var selectionSortData = _.cloneDeep(data);
+var selectionSortData = _.cloneDeep(data);
  var bubbleSortData = _.cloneDeep(data);
  var insertionSortData = _.cloneDeep(data);
 
@@ -236,7 +236,11 @@ algos.bubble = function(d, speed) {
         i = len - 1,
         j = 0,
         inJ = false,
-        wait = false;
+        wait = false,
+  		flag = false;
+   	for(var k = 0; k<len;k++){
+      d[k].state = states.default;                      
+    }
     document.querySelectorAll("#button").forEach(b => b.disabled = true)
     bubbleSortTimer = setInterval(function() {
         if (i > 0) {
@@ -254,6 +258,7 @@ algos.bubble = function(d, speed) {
                 } else {
                     if (d[j].num > d[j + 1].num) {
                         swap(j, j + 1, d);
+                      	flag = true;
                     }
                     j++;
                 }
@@ -263,7 +268,14 @@ algos.bubble = function(d, speed) {
                 d[i].state = states.finished;
                 i--;
                 inJ = false;
-            }
+               if(!flag) {   
+                 	for(var k = 0; k<i+1;k++){
+                      d[k].state = states.finished;                      
+                    }
+            		clearInterval(bubbleSortTimer);
+            		document.querySelectorAll("#button").forEach(b => b.disabled = false)
+       		   }
+            }         
         } else {
             d[0].state = states.finished;
             clearInterval(bubbleSortTimer);
@@ -282,6 +294,9 @@ algos.insertion = function(d, speed) {
     j = 0;
     inJ = false;
     d[0].state = states.finished;
+  	for(var k = 1; k< len;k++){
+      d[k].state = states.default;
+    }
     insertionSortTimer = setInterval(function() {
         if (i < len) {
             if (!inJ) {
