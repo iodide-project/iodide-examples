@@ -59,8 +59,6 @@ First, let's use a plugin cell to load the Python interpreter and tell Iodide ab
 }
 
 %% md
-**Wait for a few seconds here...**  It takes a while for Python to load, and the UI doesn't currently provide feedback about when loading and compiling is complete.  (You can look in the debugger console for "Python initialization complete" however, if you're curious).
-
 ## Make a Python cell.  Import stuff and use it.
 
 Most of the standard library (at least the parts that make sense) are here and available to use.
@@ -222,7 +220,7 @@ You bet, [Numpy](http://numpy.org) works.
 import numpy as np
 
 %% md
-Let's make a simple array of zeros.  When it's displayed, it's using the same output code that Iodide uses for Javascript.  
+Let's make a simple array of zeros.  When it's displayed, it's using the same output code that Iodide uses for Javascript.
 
 (On a technical level, it's important to note that Pyodide doesn't need to copy the whole array over to the Javascript side to do this: it's only accessing the parts of the array it needs to make the display.)
 
