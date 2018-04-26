@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lorenz Attractor - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "Lorenz Attractor",
+  "lastSaved": "2018-04-25T23:38:39.590Z",
+  "lastExport": "2018-04-26T22:01:18.390Z"
+}
+
+%% md
+# The Lorenz Attractor in Iodide
+
+This notebook is inspired by the [demo notebook](https://mybinder.org/v2/gh/jupyterlab/jupyterlab-demo/18a9793b58ba86660b5ab964e1aeaf7324d667c8?urlpath=lab%2Ftree%2Fdemo%2FLorenz.ipynb) featured at the top of the ["JupyterLab is ready for users"](https://blog.jupyter.org/jupyterlab-is-ready-for-users-5a6f039b8906) announcement on the [Jupyter blog](https://blog.jupyter.org/).
+
+Having access to browser APIs and live computation alongside an analysis opens up a few opportunities when it comes to telling certain [computational narratives](https://blog.jupyter.org/project-jupyter-computational-narratives-as-the-engine-of-collaborative-data-science-2b5fb94c3c58). In this case the browser gives us richer real-time interactivity and much greater responsiveness than is typically possible with a remotely hosted kernel, and access to the media APIs offered by the web platform (particularly WebGL) allow us to create 3d graphics that are highly portable.
+
+%% js
+// this is a hack to allow the ode45-cash-karp lib to import as expected.
+// need to browserify this module.
+module = {}
+
+%% resource
+https://cdn.jsdelivr.net/npm/ode45-cash-karp@1.1.0/lib/index.min.js
+
+%% js
+ode45 = module.exports
+
+%% resource
+https://cdn.plot.ly/plotly-latest.min.js
+https://d3js.org/d3.v5.min.js
+https://code.jquery.com/jquery-1.12.4.js
+
+%% js
+function integrateLorenz(t0, tmax, dt0, S0, sigma, beta, rho) {
+  const lorenzSystem = function(dSdt, S, t) {
+    const [x,y,z] = S
+    dSdt[0] = sigma*(y-x)
+    dSdt[1] = x*(rho-z) - y
+    dSdt[2] = x*y - beta*z
+  }
+  const integrator = ode45( S0.slice(), lorenzSystem, t0, dt0 )
+  // Integrate up to tmax:
+  const t = [], S = []
+  while( integrator.step( tmax ) ) {
+  // while( t.length < 2000 ) {
+    // Store the solution at this timestep:
+    // integrator.step()
+    t.push( integrator.t )
+    S.push( integrator.y.slice() )
+  }
+  return [S,t]
+}
+
+%% js
+sigma = 10
+beta = 2.67
+rho = 28
+
+var t0 = 0, tmax = 4, dt0 = 1e-3
+S0random = () => [50*(Math.random()-.5), 50*(Math.random()-.5), 40*Math.random()+10]
+var S0 = S0random()
+
+var numTraces = 10
+tracesS0 = []
+traceData = []
+traces = []
+for (let i=0; i<numTraces; i++){
+  tracesS0.push(S0random())
+  traceData.push(integrateLorenz(t0, tmax, dt0, tracesS0[i].slice(), sigma, beta, rho))
+  traces.push({
+    type: 'scatter3d',
+    mode: 'lines',
+    x: traceData[i][0].map(s => s[0]),
+    y: traceData[i][0].map(s => s[1]),
+    z: traceData[i][0].map(s => s[2]),
+    // opacity: .5,
+    name: "line-"+i,
+    line: {width: 4, color: d3.interpolateRainbow(i/numTraces)}
+    })
+}
+traces
+
+%% js
+function initPlot(){
+  Plotly.newPlot(
+    'lorenz-graph',
+    traces,
+    {
+      showlegend: false,
+      height: 600,
+      width:600,
+      autosize: false,
+      scene:{
+        xaxis: {range: [-30, 30], autorange: false, tickmode: 'linear', tick0: 0, dtick: 5},
+        yaxis: {range: [-30, 30], autorange: false, tickmode: 'linear', tick0: 0, dtick: 5},
+        zaxis: {range: [0, 70], autorange: false, tickmode: 'linear', tick0: 0, dtick: 5},
+        aspectratio: {x: 1, y: 1, z: 1}
+      },
+      margin: { l: 0, r: 0, b: 0, t: 0, pad: 0},
+    }            
+  )
+}
+
+%% js
+function updateTraces(tracesS0, sigma, beta, rho){
+  const traceUpdates = []
+  for (let i=0; i<numTraces; i++){
+    traceUpdates.push(integrateLorenz(t0, tmax, dt0, tracesS0[i].slice(), sigma, beta, rho))
+  }
+  var data_update = {
+      x: traceUpdates.map(tr => tr[0].map(s => s[0])),
+      y: traceUpdates.map(tr => tr[0].map(s => s[1])),
+      z: traceUpdates.map(tr => tr[0].map(s => s[2])),
+      }
+  Plotly.restyle('lorenz-graph', data_update)
+}
+
+%% js
+// jQuery is out of fashion for building gigantic web apps, but it's extremely well-documented 
+// and quite well-suited for doing interactive manipulations of the DOM in smaller code bases,
+// like an Iodide notebook.
+
+// In the future, we may wrap this functionality into a "widgets" section of our standard lib,
+// but because we're close to the DOM and there are already so many libs that do this, it's not
+// a pressing need.
+
+function initControls(){ 
+  props = {
+    sigma: {min:0, max:50, value:10, step: .01},
+    beta: {min:-2, max:10, value:2.67, step: .01},
+    rho: {min:0, max:50, value:28, step: .01},
+  }
+
+  $("#lorenz-controls").empty();
+  // set up sliders
+  ["sigma","beta","rho"].forEach( (param) => {
+    controlDiv = $(`<div><input id="${param}-slider" type="range" step="0.01"></input>
+${param} (<span id="${param}-val">${props[param].value}</span>)<div>`)
+    $("#lorenz-controls").append(controlDiv)
+    
+    const thisSlider = $(`#${param}-slider`)
+    thisSlider.prop(props[param])   
+    thisSlider.on("input", () => {
+      const [sigma, beta, rho] = getUiParamVals()
+      updateTraces(tracesS0, sigma, beta, rho)
+      setUiParamVals({sigma, beta, rho})
+    })      
+  })
+  
+  // set up reset button
+  const buttonDiv = $('<div><input id="reset-button" type="button" value="Reset parameters"></div>)')
+  $("#lorenz-controls").append(buttonDiv)
+  $("#reset-button").on("click", () => {
+    const [sigma,beta,rho] = [10, 2.67, 28]
+    setUiParamVals({sigma, beta, rho})
+    setSliderVals({sigma, beta, rho})
+    updateTraces(tracesS0, sigma, beta, rho)
+  })
+}
+
+function getUiParamVals(){
+  return ["sigma","beta","rho"].map( param => 
+    $(`#${param}-slider`).prop("value")
+  )
+}
+  
+function setUiParamVals(paramObj){
+  ["sigma","beta","rho"].forEach( param => $(`#${param}-val`).html(paramObj[param]) )
+}
+
+function setSliderVals(paramObj){
+  ["sigma","beta","rho"].forEach( param => $(`#${param}-slider`).prop("value", paramObj[param]) )
+}
+
+%% md
+### The Lorenz system
+
+Let's explore the Lorenz system of differential equations:
+
+$$
+\begin{aligned}
+\dot{x} & = \sigma(y-x) \\
+\dot{y} & = \rho x - y - xz \\
+\dot{z} & = -\beta z + xy
+\end{aligned}
+$$
+
+Below we plot the evolution of this system for several different randomly chosen initial conditions (the trajectory for each initial condition is shown in a different color). You can rotate, pan, and zoom to gain a better understanding of the three-dimensional structure of the attractor. Additionally, you can adjust the sliders below to change the parameters of the system.
+
+<div id="lorenz-graph"> </div>
+
+<div id="lorenz-controls"> </div>
+
+%% js
+initPlot()
+initControls()
+
+%% css
+/* let's add a fine border around the plot canvas to make it clearer when the plot gets cut off at the edge of the canvas*/
+#lorenz-graph canvas { border: 1px solid #eee }
+</script>
+<div id='page'></div>
+<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+</body>
+</html>
