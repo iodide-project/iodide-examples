@@ -12,7 +12,7 @@
   "title": "Lorenz Attractor",
   "viewMode": "presentation",
   "lastSaved": "2018-04-25T23:38:39.590Z",
-  "lastExport": "2018-04-26T23:58:32.626Z"
+  "lastExport": "2018-05-05T23:31:35.628Z"
 }
 
 %% md
@@ -93,6 +93,7 @@ for (let i=0; i<numTraces; i++){
 
 %% js
 function initPlot(){
+  $("#lorenz-graph").empty();
   Plotly.newPlot(
     'lorenz-graph',
     traces,
@@ -198,7 +199,11 @@ $$
 
 Below we plot the evolution of this system for several different randomly chosen initial conditions (the trajectory for each initial condition is shown in a different color). You can rotate, pan, and zoom to gain a better understanding of the three-dimensional structure of the attractor. Additionally, you can adjust the sliders below to change the parameters of the system.
 
-<div id="lorenz-graph"> </div>
+<div id="lorenz-graph">
+  (loading Plotly graphing lib)
+  </br></br>
+  <img src="https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif"></img>
+</div>
 
 <div id="lorenz-controls"> </div>
 
@@ -209,6 +214,11 @@ initControls()
 %% css
 /* let's add a fine border around the plot canvas to make it clearer when the plot gets cut off at the edge of the canvas*/
 #lorenz-graph canvas { border: 1px solid #eee }
+/* let's also add some styling to the "loading" message */
+#lorenz-graph {
+  text-align: center;
+  font-style: italic;
+}
 </script>
 <div id='page'></div>
 <script src='https://iodide-project.github.io/master/iodide.master.js'></script>
