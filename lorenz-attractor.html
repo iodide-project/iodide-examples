@@ -11,7 +11,7 @@
 {
   "title": "Lorenz Attractor",
   "lastSaved": "2018-04-25T23:38:39.590Z",
-  "lastExport": "2018-04-26T22:01:18.390Z"
+  "lastExport": "2018-04-26T23:58:32.626Z"
 }
 
 %% md
@@ -33,8 +33,12 @@ https://cdn.jsdelivr.net/npm/ode45-cash-karp@1.1.0/lib/index.min.js
 ode45 = module.exports
 
 %% resource
-https://cdn.plot.ly/plotly-latest.min.js
+https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.36.1/plotly.min.js
+
+%% resource
 https://d3js.org/d3.v5.min.js
+
+%% resource
 https://code.jquery.com/jquery-1.12.4.js
 
 %% js
@@ -85,7 +89,6 @@ for (let i=0; i<numTraces; i++){
     line: {width: 4, color: d3.interpolateRainbow(i/numTraces)}
     })
 }
-traces
 
 %% js
 function initPlot(){
@@ -94,8 +97,8 @@ function initPlot(){
     traces,
     {
       showlegend: false,
-      height: 600,
-      width:600,
+      height: 550,
+      width: 800,
       autosize: false,
       scene:{
         xaxis: {range: [-30, 30], autorange: false, tickmode: 'linear', tick0: 0, dtick: 5},
