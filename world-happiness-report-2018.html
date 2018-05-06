@@ -10,8 +10,8 @@
 %% meta
 {
   "title": "World Happiness Report 2018",
-  "lastSaved": "2018-05-06T19:29:04.546Z",
-  "lastExport": "2018-05-06T19:29:09.861Z"
+  "lastSaved": "2018-05-06T19:39:05.127Z",
+  "lastExport": "2018-05-06T19:39:09.271Z"
 }
 
 %% md
@@ -58,12 +58,12 @@ var z = d3.scaleOrdinal()
 d3.csv("https://gist.githubusercontent.com/djbarnwal/521eb8da9f6546c18f2b7d6d0f365549/raw/f9f39e0e58fdbcf4bbd66a8cbfec5df497ae1b79/happiness_data.csv", function(d, i, columns) {
   return d;
   }, function(error, data) {
-  	dataset = data
+    dataset = data
     if (error) throw error;
 
     keys = data.columns.slice(3);
-	
-  	// Sort row on basis of Happiness Score
+  
+    // Sort row on basis of Happiness Score
     data.sort(function(a, b) { return b['Happiness score'] - a['Happiness score']; });
     y.domain(data.map(function(d) { return d.Country; }));
     x.domain([0, d3.max(data, function(d) { return d['Happiness score']; })]).nice();
@@ -198,23 +198,23 @@ keys
 
 %% css
 .stats {
-	display: flex;
-	padding: 15px 15px 30px;
+  display: flex;
+  padding: 15px 15px 30px;
 }
 
 .count {
-	text-align: center;
-	font-size: 20px;
-	border-radius: 50%;
-	width: 150px;
-	height: 150px;
-	padding: 25px;
+  text-align: center;
+  font-size: 20px;
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  padding: 25px;
 }
 
 .count span {
-	display: block;
-	font-size: 34px;
-	font-weight: 100;
+  display: block;
+  font-size: 34px;
+  font-weight: 100;
 }
 
 %% js
@@ -283,16 +283,16 @@ Some interesting observations -
 
 %% css
 .meanCount {
-	height: 150px;
-	width: 150px;
-	border-radius: 50%;
-	flex-direction: column-reverse;
-	font-size: 13px;
-	text-align: center;
-	justify-content: end;
-	padding: 0 11px;
-	display: flex;
-	margin: 10px 25px;
+  height: 150px;
+  width: 150px;
+  border-radius: 50%;
+  flex-direction: column-reverse;
+  font-size: 13px;
+  text-align: center;
+  justify-content: end;
+  padding: 0 11px;
+  display: flex;
+  margin: 10px 25px;
 }
 
 .meanCount h {
@@ -431,6 +431,7 @@ var HapTrace = [{
 
 
 var layout = {
+  width: 1080,
   margin: {
     t: 10,
   },
@@ -488,15 +489,15 @@ div#notebook-container.presentation-mode {
 }
 
 .presentation-mode .user-markdown h1 {
-	font-size: 50px;
-	padding: 30px 0;
-	letter-spacing: 2px;
+  font-size: 50px;
+  padding: 30px 0;
+  letter-spacing: 2px;
     font-weight: 900;
 }
 
 .presentation-mode .user-markdown h2 {
-	font-size: 35px;
-	letter-spacing: 2px;
+  font-size: 35px;
+  letter-spacing: 2px;
     padding-top: 35px;
 }
 
@@ -523,6 +524,9 @@ div#notebook-container.presentation-mode {
 .presentation-mode #choropleth .layer.bg rect {
     fill-opacity: 0 !important;
 }
+
+%% js
+
 
 %% js
 </script>
