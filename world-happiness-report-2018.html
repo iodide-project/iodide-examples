@@ -10,8 +10,8 @@
 %% meta
 {
   "title": "World Happiness Report 2018",
-  "lastSaved": "2018-05-06T19:39:05.127Z",
-  "lastExport": "2018-05-06T19:39:09.271Z"
+  "lastSaved": "2018-05-08T20:17:19.044Z",
+  "lastExport": "2018-05-08T20:58:39.129Z"
 }
 
 %% md
@@ -58,12 +58,12 @@ var z = d3.scaleOrdinal()
 d3.csv("https://gist.githubusercontent.com/djbarnwal/521eb8da9f6546c18f2b7d6d0f365549/raw/f9f39e0e58fdbcf4bbd66a8cbfec5df497ae1b79/happiness_data.csv", function(d, i, columns) {
   return d;
   }, function(error, data) {
-    dataset = data
+  	dataset = data
     if (error) throw error;
 
     keys = data.columns.slice(3);
-  
-    // Sort row on basis of Happiness Score
+	
+  	// Sort row on basis of Happiness Score
     data.sort(function(a, b) { return b['Happiness score'] - a['Happiness score']; });
     y.domain(data.map(function(d) { return d.Country; }));
     x.domain([0, d3.max(data, function(d) { return d['Happiness score']; })]).nice();
@@ -198,23 +198,23 @@ keys
 
 %% css
 .stats {
-  display: flex;
-  padding: 15px 15px 30px;
+	display: flex;
+	padding: 15px 15px 30px;
 }
 
 .count {
-  text-align: center;
-  font-size: 20px;
-  border-radius: 50%;
-  width: 150px;
-  height: 150px;
-  padding: 25px;
+	text-align: center;
+	font-size: 20px;
+	border-radius: 50%;
+	width: 150px;
+	height: 150px;
+	padding: 25px;
 }
 
 .count span {
-  display: block;
-  font-size: 34px;
-  font-weight: 100;
+	display: block;
+	font-size: 34px;
+	font-weight: 100;
 }
 
 %% js
@@ -246,12 +246,13 @@ $$
 The **mean** value for the various parameters after normalizing them are -
 
 %% js
-// Deep clone array of objects for later use
+// Deep cloning array of objects for later use
 var unscaled_dataset = JSON.parse(JSON.stringify(dataset));
 
+var extendedKeys = ['Happiness score', ...keys];
 var scales = {};
 
-for (key of keys) {
+for (key of extendedKeys) {
   scales[key] = d3.scaleLinear().domain(d3.extent(unpack(key, dataset)))
 }
 
@@ -262,7 +263,7 @@ function normalize(value, property) {
 
 dataset.forEach(function(d){
   for(var property in d) {
-    if(keys.indexOf(property) >=0) {
+    if(extendedKeys.indexOf(property) >=0) {
       d[property] = normalize(d[property], property).toFixed(3)
     }
   }
@@ -283,16 +284,16 @@ Some interesting observations -
 
 %% css
 .meanCount {
-  height: 150px;
-  width: 150px;
-  border-radius: 50%;
-  flex-direction: column-reverse;
-  font-size: 13px;
-  text-align: center;
-  justify-content: end;
-  padding: 0 11px;
-  display: flex;
-  margin: 10px 25px;
+	height: 150px;
+	width: 150px;
+	border-radius: 50%;
+	flex-direction: column-reverse;
+	font-size: 13px;
+	text-align: center;
+	justify-content: flex-end;
+	padding: 0 11px;
+	display: flex;
+	margin: 10px 25px;
 }
 
 .meanCount h {
@@ -386,15 +387,15 @@ var layout = {
       color: '#fefefe'
     }
   },
-  plot_bgcolor: 'transparent',
-  paper_bgcolor: 'transparent'
+  plot_bgcolor: '#302f33',
+  paper_bgcolor: '#302f33'
 };
 
 Plotly.newPlot('top5', topTrace, layout, {displayModeBar: false});
 Plotly.newPlot('bottom5', bottomTrace, layout, {displayModeBar: false});
 
 %% md
-_Add inference_
+Happy Countries share in common a high GDP, great Social Support, a good life expectancy and a relatively high Freedom to make life choices. Countries with a bad happy score are in general poor and rank low on perceptions of corruption.
 
 %% md
 ## Are Happiness and Money correlated?
@@ -447,25 +448,144 @@ var layout = {
     showline: false,
     gridcolor: '#555',
   },
-  plot_bgcolor: 'transparent',
-  paper_bgcolor: 'transparent'
+  plot_bgcolor: '#302f33',
+  paper_bgcolor: '#302f33'
 };
 
 Plotly.newPlot('hapGDP', HapTrace, layout,{displayModeBar: false});
 
 %% md
-The data points are spread throughout the plot. We can observe that on average happiness increases as GDP per Capita increases. There are outliers such as **Somali** and **Qatar**, both having similar Happiness score but are on the opposite end of the spectrum in terms of GDP Per Capita.
+The data points are spread throughout the plot. We can observe that on average happiness increases as GDP per Capita increases. There are outliers such as **Somalia** and **Qatar**, both having similar Happiness score but are on the opposite end of the spectrum in terms of GDP Per Capita.
 
 On average countries with higher GDP Per Capita have higher happiness and countries with lower GDP Per Capita have lower happiness. The spread is very diverse for nations having GDP Per Capita in the mid range.
 
 %% md
 ## Does region affect Happiness?
 
-_Group data and analyze_
+It is quite evident from the Choropleth map (at the beginning of this report) that some areas are more happy than the others. The below tables shows us the disparities between different regions of the world.
 
 %% js
 var regions = [...new Set(unpack('Region indicator', dataset))];
-regions
+
+var dataByRegion = d3.nest()
+  .key(function(d) { return d['Region indicator']; })
+  .rollup(function(v) { 
+    var regData = {};
+    for(key of keys) {
+      regData[key] = d3.mean(v, function(d) { return d[key]; }).toFixed(3)
+    }
+    return {...regData, 'Happiness score': d3.mean(v, function(d) { return d['Happiness score']; }).toFixed(3)}; })
+  .entries(dataset);
+
+dataByRegion
+
+%% css
+#regionTable {
+  font: 13px
+}
+
+#regionTable th {
+  text-align: right;
+  padding-right: 6px;
+  min-width: 43px;
+  text-align: left;
+}
+
+#regionTable thead td {
+  cursor: s-resize;
+}
+
+#regionTable tbody tr:first-child td {
+  padding-top: 2px;
+}
+
+.user-markdown table th, .user-markdown table td {
+	border: none !important;
+}
+
+#regionTable thead tr:first-child th {
+	text-align: center;
+}
+
+#regionTable tbody td {
+  padding: 0;
+  border-left: solid 1px #000;
+  width: 110px;
+}
+
+/* #regionTable tbody circle {
+  fill: steelblue;
+} */
+
+.toolTip {
+  position: absolute;
+  display: none;
+  min-width: 80px;
+  height: auto;
+  background: none repeat scroll 0 0 #ffffff;
+  border: 1px solid #6F257F;
+  padding: 14px;
+  text-align: center;
+}
+
+%% js
+extendedKeys
+
+%% md
+<table id='regionTable'>
+  <thead>
+    <tr>
+      <td>Region</td>
+      <th>Happiness Score</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+%% md
+North America and ANZ is the happiest region. They are doing considerably better than the other regions in almost all the categories. Sub-Saharan Africa and South Asia are lagging behind the others. Perceptions of corruption are bad in most of the regions. There is a great resemblance between Western Europe and North America with the current scoring parameters.
+
+%% js
+d3.select("#regionTable thead tr").selectAll("th")
+  .data(extendedKeys)
+  .enter().append("th")
+  .text(function(d) { return d });
+
+var regColors = ['#600ce8', '#c42f59', '#0574ab', '#5f4bb6', '#86a5d9', '#499f68', '#34515f', '#73c2be', '#d7907b', '#27476e'];
+
+var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+
+var tr = d3.select("#regionTable tbody").selectAll("th")
+    .data(dataByRegion)
+  .enter().append("tr");
+
+tr.append("th")
+    .text(function(d) { return d.key; });
+
+tr.selectAll("td")
+    .data(function(d) { return extendedKeys.map(function(k) { return d.value[k]}); })
+  .enter().append("td").append("svg")
+    .attr("width", 110)
+    .attr("height", 50)
+  .append("circle")
+    .attr("r", function(d) { return d * 25; })
+    .attr("cx", 55)
+    .attr("cy", 25)
+    .on("mousemove", function(d){
+        tooltip
+          .style("left", d3.event.pageX - 50 + "px")
+          .style("top", d3.event.pageY - 70 + "px")
+          .style("display", "inline-block")
+          .html('Value' + "<br>" + (d));
+    })
+        .on("mouseout", function(d){ tooltip.style("display", "none");});
+    // .attr("width", function(d) { return d * 50; });
+
+d3.select("#regionTable tbody")
+  .selectAll("tr")
+  .data(regColors)
+  .style("fill", function(d) {return d});
 
 %% css
 /* Notebook Presentation view settings */
@@ -489,15 +609,15 @@ div#notebook-container.presentation-mode {
 }
 
 .presentation-mode .user-markdown h1 {
-  font-size: 50px;
-  padding: 30px 0;
-  letter-spacing: 2px;
+	font-size: 50px;
+	padding: 30px 0;
+	letter-spacing: 2px;
     font-weight: 900;
 }
 
 .presentation-mode .user-markdown h2 {
-  font-size: 35px;
-  letter-spacing: 2px;
+	font-size: 35px;
+	letter-spacing: 2px;
     padding-top: 35px;
 }
 
@@ -525,8 +645,10 @@ div#notebook-container.presentation-mode {
     fill-opacity: 0 !important;
 }
 
-%% js
-
+.presentation-mode .user-markdown table tr {
+    background-color: transparent !important;
+    border-color: #444;
+}
 
 %% js
 </script>
