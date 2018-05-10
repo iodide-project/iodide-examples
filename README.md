@@ -1,6 +1,7 @@
 # iodide-examples
 ### Start here:
 https://iodide-project.github.io/iodide-examples/what-a-web-notebook-looks-like.html
+
 ### Then try these featured notebooks:
 - https://iodide-project.github.io/iodide-examples/lorenz-attractor-pres.html
 - https://iodide-project.github.io/iodide-examples/world-happiness-report-2018.html
@@ -13,6 +14,9 @@ Be sure to check out these two examples, which feature Python running _entirely 
 - https://iodide-project.github.io/iodide-examples/hipster-band-finder.html
 - https://iodide-project.github.io/iodide-examples/python.html
 
+_Please let us know if you spot any errors!_ (An issue is great; A PR is ideal!)
+
+You can load an of the other notebooks in the repo by loading the url ` https://iodide-project.github.io/iodide-examples/{NOTEBOOK_NAME}`, but be aware that not all of them have recieved the same level of attention and some may be a bit rough.
 
 # Contributing
 __Creating a demo and/or documentation notebookks is the best way to begin contributing to Iodide!__
@@ -22,6 +26,8 @@ Contributions are very much desired -- as you can see, we've been focusing so in
 You can get started by visiting https://iodide-project.github.io/master/ -- from there, you can begin working on a notebook, and export it to your local machine when you're happy with it.
 
 When you have something you want to share, submit a PR to this repo. Before submitting a PR, please ensure that the resource links to the CSS and JS files in your exported notebooks use the URI `https://iodide-project.github.io/master/iodide.master.*`. (Note that if you started working from the link above, you shouldn't have to do anything.
+
+Please be aware that you contibutions to this repo will be open-source -- other folks may propose changes to clarify, clean-up, or enhance your notebooks.
 
 # Suggestions for top-notch notebooks
 
