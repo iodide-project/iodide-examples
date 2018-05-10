@@ -51,9 +51,9 @@ for (let i=0; i<10; i++){range.push(i)}
 A = range.map( (x,i) => range.map( (y,j) => (Math.random()+i-.5)))
 
 %% md
-## Objects with a render method
+## Objects with an "iodideRender" method
 
-Objects can define their own custom output by adding a `render` method.
+Objects can define their own custom output by adding a `iodideRender` method.
 
 This method may return any of the following:
 
@@ -73,7 +73,7 @@ var GeoLocation = class GeoLocation {
     this.lon = lon
   }
 
-  render() {
+  iodideRender() {
     // return a string containing HTML
     return '<img src="http://staticmap.openstreetmap.de/staticmap.php?center=' + this.lat + ',' + this.lon + '&zoom=17&size=600x300&maptype=mapnik"/>'
   }

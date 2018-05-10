@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pandas - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "Pandas",
+  "languages": {
+    "js": {
+      "pluginType": "language",
+      "languageId": "js",
+      "displayName": "Javascript",
+      "codeMirrorMode": "javascript",
+      "module": "window",
+      "evaluator": "eval",
+      "keybinding": "j",
+      "url": ""
+    },
+    "py": {
+      "languageId": "py",
+      "displayName": "python",
+      "codeMirrorMode": "python",
+      "keybinding": "p",
+      "url": "https://iodide-project.github.io/pyodide-demo/pyodide.js",
+      "module": "pyodide",
+      "evaluator": "runPython",
+      "pluginType": "language"
+    }
+  },
+  "lastExport": "2018-05-07T19:13:36.290Z"
+}
+
+%% md
+# Hipster Band Finder
+
+In this experiment, we'll attempt to replicate a classic hipster pastime: to
+find one really great band that no one has ever heard of.
+
+To do this, we'll use at a [publicly available
+dataset](http://jmcauley.ucsd.edu/data/amazon/) of 63k reviews of music posted
+to Amazon.com spanning May 1996 - July 2014.
+
+There are a few inherent limitations in this data set:
+
+1) It doesn't distinguish between CD, vinyl and digital sales, which would
+definitely help filter for hipster cred.
+
+2) It includes data from a mainstream retailer, so probably doesn't include the
+very best bands, which we all know are sold on recycled 8 track tapes out of a
+leather suitcase at the Fort Greene flea market in Brooklyn on the first
+Saturday of the month.
+
+That said, given those limitations, we should still have some fun and illustrate
+using Python, Numpy and Pandas inside Iodide along the way.  This assumes some
+basic familiarity with Pandas.
+
+%% md
+
+## Loading Python
+
+The first thing we want to do is load the Pyodide plugin for Iodide, which will
+give us Python support. (Don't worry too much about the details here. This
+is just a snippet of JSON that describes how to load and use the language
+plugin.)
+
+%% plugin
+{
+  "languageId": "py",
+  "displayName": "python",
+  "codeMirrorMode": "python",
+  "keybinding": "p",
+  "url": "https://iodide-project.github.io/pyodide-demo/pyodide.js",
+  "module": "pyodide",
+  "evaluator": "runPython",
+  "pluginType": "language"
+}
+
+%% md
+
+We now have a Python environment loaded and ready to go.  Let's test it.
+
+%% code {"language":"py"}
+
+import sys
+sys.version
+
+%% md
+
+## Loading Pandas
+
+Pyodide doesn't automatically load all of the third party packages, so we first
+need to load Pandas into the browsers virtual file system:
+
+%% js
+pyodide.loadPackage("pandas")
+
+%% md
+## Load the data into a data frame
+
+Pyodide contains a few helper functions for working in a browser environment in
+the `pyodide` module.
+
+In this case, we'll use `pyodide.open_url` to fetch the data from a URL and
+convert it into a Python file-like object that Pandas understands how to read.
+Under the hood it's using the Javascript `XMLHttpRequest` object to do the
+network transfer, but it all looks like synchronous file reading to Python.
+
+%% code {"language":"py"}
+
+import pandas as pd
+import pyodide
+
+df = pd.read_csv(pyodide.open_url("music-reviews.csv"))
+df.describe(include='all')
+
+%% md
+
+## The columns
+
+Each row in the table represents an album.
+
+The columns are:
+
+- `amazon-id`: A unique ID Amazon uses for every product. You can plug this into
+  the URL `http://amazon.com/gp/product/{amazon-id}` to see what it corresponds
+  to.
+- `artist`: The artist name
+- `n-reviews`: The number of reviews submitted
+- `overall`: The average review score (from 1 to 5, but 0 if there are no
+  reviews)
+- `price`: The price (in USD)
+- `root-genre`: The primary genre of the album, from a set of only 16 values
+- `salesRank`: Where the item ranks with respect to other items on Amazon. The
+  data set does not include actual sales numbers, only ranking.
+- `title`: The album name
+
+%% md
+
+## Data cleanup
+
+Let's start by doing some data cleanup.
+
+%% md
+
+Looking at the column summary for the number of reviews, you can see that
+there's quite a large number of albums without any reviews. We can't really make
+any conclusions about albums without reviews, and it's probably spurious to make
+conclusions about albums with less than, say, 3 reviews, so let's remove those
+from the data set.
+
+%% code {"language":"py"}
+
+df = df[df['n-reviews'] >= 3.0]
+len(df)
+
+%% md
+
+The `salesRank` column is a ranking across all products at Amazon, including
+toasters and cat toys. For simplicity, let's make the rankings contiguous only
+within the Music products. That's easy with the `rank` method:
+
+%% code {"language":"py"}
+
+df['salesRank'] = df['salesRank'].rank()
+
+%% md
+
+Now it would be helpful to plot some things in order to look more at the nature
+of the data.
+
+Pandas has very convenient and tight integration with matplotlib, but
+unfortunately we don't have matplotlib running in the browser. Instead, we can
+pass the data from Pandas to any Javascript plotting library. In this case,
+we'll use [Plotly](http://plot.ly).
+
+(Note that even though Plotly has a Python interface, we're not using that here.
+It's not really needed since with Pyodide, we can just pass Python objects to
+any Javascript library with ease.)
+
+The first thing we need to do is import the code for Plotly using a resource
+cell:
+
+%% resource
+
+https://cdn.plot.ly/plotly-latest.min.js
+
+%% md
+
+Let's look at the distribution of the number of reviews per album. Note we using
+a log scale here.
+
+%% code {"language":"py"}
+
+from js import Plotly
+from js import iodide
+
+Plotly.plot(
+    iodide.output.element('div'), # This t
+    [{ 'y': sorted(df['n-reviews'], reverse=True) }],
+    { 'yaxis': {'type': 'log'}})
+
+%% md
+
+While a handful of albums have almost 2,000 reviews, the vast majority have less
+than 10.
+
+Out of curiosity, let's see what the most reviewed album is:
+
+%% code {"language":"py"}
+
+df.loc[df['n-reviews'].argmax()]
+
+%% md
+
+Now let's get back to finding our hipster band. Let's make sure there will be
+enough well-reviewed albums that have a low sales rank.
+
+Let's make a scatter plot of all albums showing `review` vs. `salesRank`.
+
+%% code {"language":"py"}
+
+Plotly.plot(
+  iodide.output.element('div'),
+  [{
+    'x': list(df['salesRank']),
+    'y': list(df['overall']),
+    'text': list(df['title']),
+    'type': 'scattergl',
+    'mode': 'markers',
+    'opacity': 0.5,
+    'marker': {'size': 2.0}
+  }])
+
+%% md
+
+You can see that while there are good albums all across the entire `salesRank`
+range, better reviews do seem to correspond to more sales, but only just barely.
+Let's fit a line to these points using `numpy.polyfit` to show that:
+
+%% code {"language":"py"}
+
+import numpy as np
+m, b = np.polyfit(df['salesRank'], df['overall'], deg=1)
+x = np.arange(df['salesRank'].max())
+
+%% code {"language":"py"}
+
+Plotly.plot(
+  iodide.output.element('div'),
+  [{
+    'x': list(df['salesRank']),
+    'y': list(df['overall']),
+    'text': list(df['title']),
+    'type': 'scattergl',
+    'mode': 'markers',
+    'opacity': 0.5,
+    'marker': {'size': 2.0}
+  },
+  {
+    'x': x,
+    'y': m*x + b,
+    'type': 'scattergl',
+    'mode': 'line'
+  }])
+
+%% md
+
+This is all quite rough because we are working with sales "rankings" and not
+actual sales figures in terms of items sold or dollars, so we can't draw too
+many conclusions.
+
+Since we are actually looking for the most hipster *band* and not *album*, let's
+regroup our data by artist.
+
+%% code {"language":"py"}
+
+artists = df.groupby('artist').agg(
+    {'n-reviews': 'sum',
+     'overall': 'mean',
+     'price': 'mean',
+     'salesRank': 'mean',
+     'title': 'count'})
+artists.describe(include='all')
+
+%% md
+
+Let's define "the most hipster band" as the band with all 5-star reviews with
+the lowest sales ranking.
+
+%% code {"language":"py"}
+
+five_stars = artists[artists['overall'] == 5.0]
+hipster = artists.loc[five_stars['salesRank'].argmax()]
+hipster
+
+%% md
+
+That's great! We have a name. Let's make a little convenience function to make
+it easier to show their albums on Amazon.
+
+%% code {"language":"py"}
+
+from js import document
+
+def show_albums(name):
+    albums = df[df['artist'] == name]
+    ul = iodide.output.element('ul')
+    for idx, album in albums.iterrows():
+        li = document.createElement('li')
+        a = document.createElement('a')
+        a.setAttribute('href', 'http://amazon.com/gp/product/' + album['amazon-id'])
+        a.setAttribute('target', '_blank')
+        a.textContent = album['title']
+        li.appendChild(a)
+        ul.appendChild(li)
+
+%% code {"language":"py"}
+
+show_albums(hipster.name)
+
+%% md
+
+This seems like a good choice, but this artist only seems to have put out one
+album. What if we want a band that has been toiling in obscurity over many
+years, putting out album after poor-selling album? Let's filter the dataset to
+only include bands with at least 3 albums.
+
+%% code {"language":"py"}
+
+hipster = artists.loc[five_stars[five_stars['title'] >= 3.0]['salesRank'].argmax()]
+hipster
+
+%% code {"language":"py"}
+
+show_albums(hipster.name)
+
+</script>
+<div id='page'></div>
+<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+</body>
+</html>
