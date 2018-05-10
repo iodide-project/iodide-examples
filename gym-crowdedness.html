@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gym Crowdedness - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "Gym Crowdedness",
+  "lastSaved": "2018-03-27T03:08:12.605Z",
+  "lastExport": "2018-05-10T00:55:33.152Z"
+}
+
+%% md
+# Exploring the Campus Gym Crowdedness Dataset <br/>
+
+## Data
+Each row in the dataset represents how many people were in the campus gym at a given time. Measurements were taken every 10 minutes at the campus gym over the course of a year. Other feature columns such as temperature and day of week have been added to the dataset.
+
+Source:
+<a href="https://www.kaggle.com/nsrose7224/crowdedness-at-the-campus-gym">Kaggle - Crowdedness at the Campus Gym</a>
+
+## Purpose
+The purpose of this notebook is to explore and analyze the Campus Gym Crowdedness Dataset for correlations between the number of people in the campus gym and other features such as temperature and time. 
+
+## Libraries Used
+- D3.js
+- plotly.js
+- jStat
+
+## Import and explore csv data using d3.js
+Import d3
+
+%% resource
+https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.2/d3.js
+
+%% md
+Import the data using D3
+
+%% js
+const URL = "https://gist.githubusercontent.com/jandrewtorres/0e40e6b3368af619a2287c1fa6508483/raw/a0661154081f625e6a74f672dd55db62a9dd8a5a/gym_crowdedness.csv"
+
+// the columns in the dataset will be needed later for calculations
+var columns = {}
+
+var getData = function(url) {
+  var re = new XMLHttpRequest()
+  re.open('GET', url, false)
+  re.send(null)
+  return re.response
+}
+
+var data = d3.csvParse(getData(URL))
+
+// configure columns
+Object.keys(data[0]).forEach((key) =>{
+  columns[key] = new Array()
+})
+
+data.forEach((row) => {
+  Object.keys(columns).forEach((key) => {
+    columns[key].push(Number(row[key]))
+  })
+})
+
+%% md
+Verify data imported successfully and preview dataset
+
+%% js
+data
+
+%% md
+Verify columns has been configured correctly
+
+%% js
+columns
+
+%% md
+## Wrangle the data and calculate correlation coefficients between features
+
+%% md
+We want to explore the correlations between the different columns. To do so, we will need to calculate the correlation coefficients using jStat.corrcoeff() which accepts two feature columns as parameters and returns their Pearson Correlation Coefficient in the range [-1, 1]
+
+%% resource
+https://cdnjs.cloudflare.com/ajax/libs/jstat/1.7.1/jstat.min.js
+
+%% md
+Notice that the 'date' and 'timestamp' feature columns are continuous and will not give us meaningful correlations. Let's delete them.
+
+%% js
+delete columns['date']
+delete columns['timestamp']
+
+%% md
+We are now ready to calculate the correlation coefficients for all column pairs
+
+%% js
+var correlationCoefficients = {}
+
+Object.keys(columns).forEach(function(xColName) {
+	var xColumn = columns[xColName]
+    console.log(xColumn)
+    correlationCoefficients[xColName] = new Array()
+    Object.keys(columns).forEach(function(yColName) {
+      var yColumn = columns[yColName]
+      correlationCoefficients[xColName].push(jStat.corrcoeff(xColumn, yColumn))
+    })
+})
+
+%% js
+correlationCoefficients
+
+%% md
+## Visualize correlations using plotly.js heatmap
+
+%% md
+<div id="plot"></div>
+
+%% resource
+https://cdn.plot.ly/plotly-latest.min.js
+
+%% md
+Plot the correlations in a heatmap
+
+%% js
+var zValues = new Array()
+Object.keys(correlationCoefficients).forEach(function(ccKey) {
+  zValues.push(correlationCoefficients[ccKey])
+})
+
+var heatmapData = [
+  {
+    z: zValues,
+    x: Object.keys(correlationCoefficients),
+    y: Object.keys(correlationCoefficients),
+    colorscale: 'RdBu',
+    type: 'heatmap',
+    zmin: -1,
+    zmax: 1,
+  }
+]
+
+var layout = {
+  title: 'Gym Crowdedness Correlations',
+  margin: {
+    l: 200,
+  },
+};
+
+function plotHeatmap() {
+  Plotly.newPlot('plot', heatmapData, layout, { displayModeBar: false })
+}
+
+plotHeatmap()
+
+%% md
+## Heatmap / Correlation Coefficients Conclusions
+
+There is a high positive correlation between number of people and:
+- hour
+- temperature
+- is during semester
+- is start of semester
+
+There is a high negative correlation between number of people and:
+- is weekend
+- day of week
+
+Let's create visualizations of these correlations to explore them further.
+
+## Group by feature and find mean number of people for groups
+
+%% js
+// Hour
+var byHour = d3.nest()
+	.key(function(d) { return d.hour })
+	.rollup(function(d) { 
+    	return d3.mean(d, function(g) { return g.number_people })
+    })
+	.entries(data)
+	.sort(function(a,b) {
+      return d3.descending(parseInt(a.key), parseInt(b.key))
+    })
+
+// Temperature
+function roundUp(value) {
+  return value + (2.5 - value % 2.5)
+}
+
+var byTemperature = d3.nest()
+	.key(function(d) {
+      var temperature = d.temperature
+	  return roundUp(parseInt(d.temperature))
+    })
+	.rollup(function(d) {
+      return d3.mean(d, function(g) { return g.number_people })
+    })
+	.entries(data)
+	.sort(function(a,b) {
+      return d3.descending(parseInt(a.key),parseInt(b.key))
+    })
+
+// is_start
+var byStartOfSemester = d3.nest()
+	.key(function(d) { return d.is_start_of_semester })
+	.rollup(function(d) {
+      return d3.mean(d, function(g) { return g.number_people })
+    }).entries(data)
+
+// is_during
+var byDuringSemester = d3.nest()
+	.key(function(d) { return d.is_during_semester })
+	.rollup(function(d) {
+      return d3.mean(d, function(g) { return g.number_people })
+    }).entries(data)
+
+// is_weekend
+var byIsWeekend = d3.nest()
+	.key(function(d) { return d.is_weekend })
+	.rollup(function(d) {
+      return d3.mean(d, function(g) { return g.number_people })
+    }).entries(data)
+
+// day of week
+var byDayOfWeek = d3.nest()
+	.key(function(d) { return d.day_of_week })
+	.rollup(function(d) {
+      return d3.mean(d, function(g) { return g.number_people })
+    })
+	.entries(data)
+	.sort(function(a, b) {
+      return d3.ascending(parseInt(a.key), parseInt(b.key))
+    })
+
+%% md
+## Feature groups vs mean number of people graphs
+<div id="subplot-wrapper">
+  <div id="byTemp"></div>
+  <div id="byDay"></div>
+  <div id="byHour"></div>
+  <div id="byStartOfSemester"></div>
+  <div id="byDuringSemester"></div>
+  <div id="byIsWeekend"></div>
+</div>
+
+%% md
+CSS subplot wrapper div styling
+
+%% css
+#subplot-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+%% md
+Plot the data in line and bar charts
+
+%% js
+var byTemperatureTrace = {
+  x: Object.keys(byTemperature).map(function(key, index) {
+    return byTemperature[key].key
+  }),
+  y: Object.keys(byTemperature).map(function(key, index) {
+    return byTemperature[key].value
+  }),
+  type: 'scatter'
+}
+
+var byDayOfWeekTrace = {
+  x: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  y: Object.keys(byDayOfWeek).map(function(key, index) {
+    return byDayOfWeek[key].value
+  }),
+  type: 'scatter'
+}
+
+var byHourTrace = {
+  x: Object.keys(byHour).map(function(key, index) {
+    return key
+  }),
+  y: Object.keys(byHour).map(function(key, index) {
+    return byHour[key].value
+  }),
+  type: 'scatter'
+}
+
+var byStartOfSemesterTrace = {
+  x: ["No", "Yes"],
+  y: Object.keys(byStartOfSemester).map(function(key, index) {
+    return byStartOfSemester[key].value
+  }),
+  type: 'bar'
+}
+
+var byDuringSemesterTrace = {
+  x: ["No", "Yes"],
+  y: Object.keys(byDuringSemester).map(function(key, index) {
+    return byDuringSemester[key].value
+  }),
+  type: 'bar'
+}
+
+var byIsWeekendTrace = {
+  x: ["No", "Yes"],
+  y: Object.keys(byIsWeekend).map(function(key, index) {
+	return byIsWeekend[key].value
+  }),
+  type: 'bar'
+}
+
+function plotSubPlot(divId, data, title, xaxisTitle, yaxisTitle) {
+  Plotly.newPlot(divId, data, {
+    title: title,
+    xaxis: {
+      title: xaxisTitle,
+    },
+    yaxis: {
+      title: yaxisTitle,
+    },
+    autosize: false,
+    width: 300,
+    height: 250,
+    margin: { l:50, r:0, b:50, t:50 },
+  }, { displayModeBar: false })
+}
+
+plotSubPlot('byTemp', [byTemperatureTrace], 'Temperature vs Num People', 'Temperature (F)', 'Num People')
+plotSubPlot('byDay', [byDayOfWeekTrace], 'Day of Week vs Num People', 'Day of Week', 'Num People')
+plotSubPlot('byHour', [byHourTrace], 'Hour of Day vs Num People', 'Hour', 'Num People')
+plotSubPlot('byStartOfSemester', [byStartOfSemesterTrace], 'Is Start of Semester vs Num People', 'Is Start of Semester', 'Num People')
+plotSubPlot('byDuringSemester', [byDuringSemesterTrace], 'Is During Semester vs Num People', 'Is During Semster', 'NumPeople')
+plotSubPlot('byIsWeekend', [byIsWeekendTrace], 'Is Weekend vs Num People', 'Is Weekend', 'Num People')
+
+%% md
+## Analysis of feature groups vs mean number of people graphs
+- More people go to the gym later in the day
+- There are more people in the gym when it is mild temperature outside, BUT the time of day and temperature have a relationship that is likely affecting this relationship
+- More people are in the gym at the start of the semester than the middle of the semester
+- More people are in the gym during the semester than not during the semester
+- More people are in the gym during the week than weekend
+- The average number of people in the gym steadily declines from Monday to Sunday
+
+%% md
+__original author__: John A. Torres (jandrewtorres) <br/>
+__contributors__: jandrewtorres <br/>
+__maintainer__: jandrewtorres <br/>
+__submission date__: 5/9/18 <br/>
+</script>
+<div id='page'></div>
+<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+</body>
+</html>
