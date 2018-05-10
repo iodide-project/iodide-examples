@@ -38,8 +38,8 @@
 %% md
 # Hipster Band Finder
 
-In this experiment, we'll attempt to do replicate a classic hipster pastime: to
-find that one really great band that no one has ever heard of.
+In this experiment, we'll attempt to replicate a classic hipster pastime: to
+find one really great band that no one has ever heard of.
 
 To do this, we'll use at a [publicly available
 dataset](http://jmcauley.ucsd.edu/data/amazon/) of 63k reviews of music posted
@@ -47,11 +47,11 @@ to Amazon.com spanning May 1996 - July 2014.
 
 There are a few inherent limitations in this data set:
 
-1) It doesn't distinguish between CD, Vinyl and digital sales, which would
+1) It doesn't distinguish between CD, vinyl and digital sales, which would
 definitely help filter for hipster cred.
 
 2) It includes data from a mainstream retailer, so probably doesn't include the
-very best bands, which we all know are sold on recycled 8 tracks out of a
+very best bands, which we all know are sold on recycled 8 track tapes out of a
 leather suitcase at the Fort Greene flea market in Brooklyn on the first
 Saturday of the month.
 
@@ -270,7 +270,7 @@ Plotly.plot(
 
 %% md
 
-This is all a quite rough because we are working with sales "rankings" at not
+This is all quite rough because we are working with sales "rankings" and not
 actual sales figures in terms of items sold or dollars, so we can't draw too
 many conclusions.
 
@@ -300,7 +300,8 @@ hipster
 
 %% md
 
-That's great!  We have a name.  Let's make a little convenience function to make it easier to show their albums on Amazon.
+That's great! We have a name. Let's make a little convenience function to make
+it easier to show their albums on Amazon.
 
 %% code {"language":"py"}
 
@@ -324,7 +325,10 @@ show_albums(hipster.name)
 
 %% md
 
-This seems like a good choice, but this artist only seems to have put out one album.  What if we want a band that has been toiling in obscurity over many years, putting out album after poor-selling album?  Let's filter the dataset to only include bands with at least 3 albums.
+This seems like a good choice, but this artist only seems to have put out one
+album. What if we want a band that has been toiling in obscurity over many
+years, putting out album after poor-selling album? Let's filter the dataset to
+only include bands with at least 3 albums.
 
 %% code {"language":"py"}
 
