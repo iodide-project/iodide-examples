@@ -6,6 +6,7 @@ https://iodide-project.github.io/iodide-examples/what-a-web-notebook-looks-like.
 - https://iodide-project.github.io/iodide-examples/lorenz-attractor-pres.html
 - https://iodide-project.github.io/iodide-examples/world-happiness-report-2018.html
 - https://iodide-project.github.io/iodide-examples/eviction-notices-by-sf-neighborhood--1999-2015.html
+- https://iodide-project.github.io/iodide-examples/gym-crowdedness.html
 - https://iodide-project.github.io/iodide-examples/visualize-sorting-algorithms.html
 - https://iodide-project.github.io/iodide-examples/output-handling.html
 
