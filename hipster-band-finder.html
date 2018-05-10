@@ -202,7 +202,10 @@ from js import iodide
 Plotly.plot(
     iodide.output.element('div'), # This t
     [{ 'y': sorted(df['n-reviews'], reverse=True) }],
-    { 'yaxis': {'type': 'log'}})
+    {
+      'yaxis': {'type': 'log'},
+      'width': 800
+    })
 
 %% md
 
@@ -234,7 +237,8 @@ Plotly.plot(
     'mode': 'markers',
     'opacity': 0.5,
     'marker': {'size': 2.0}
-  }])
+  }],
+  { 'width': 800 })
 
 %% md
 
@@ -266,7 +270,8 @@ Plotly.plot(
     'y': m*x + b,
     'type': 'scattergl',
     'mode': 'line'
-  }])
+  }],
+  { 'width': 800 })
 
 %% md
 
