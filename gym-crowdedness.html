@@ -11,24 +11,25 @@
 {
   "title": "Gym Crowdedness",
   "lastSaved": "2018-03-27T03:08:12.605Z",
-  "lastExport": "2018-03-27T03:37:06.899Z"
+  "lastExport": "2018-05-10T00:55:33.152Z"
 }
 
 %% md
-# Exploring the Campus Gym Crowdedness Dataset
-
-## Purpose
-The purpose of this notebook is to explore and analyze the Campus Gym Crowdedness Dataset for correlations between the number of people in the campus gym and other features such as temperature and time. 
-
-## Technologies Used
-- D3.js
-- plotly.js
+# Exploring the Campus Gym Crowdedness Dataset <br/>
 
 ## Data
 Each row in the dataset represents how many people were in the campus gym at a given time. Measurements were taken every 10 minutes at the campus gym over the course of a year. Other feature columns such as temperature and day of week have been added to the dataset.
 
 Source:
 <a href="https://www.kaggle.com/nsrose7224/crowdedness-at-the-campus-gym">Kaggle - Crowdedness at the Campus Gym</a>
+
+## Purpose
+The purpose of this notebook is to explore and analyze the Campus Gym Crowdedness Dataset for correlations between the number of people in the campus gym and other features such as temperature and time. 
+
+## Libraries Used
+- D3.js
+- plotly.js
+- jStat
 
 ## Import and explore csv data using d3.js
 Import d3
@@ -42,24 +43,26 @@ Import the data using D3
 %% js
 const URL = "https://gist.githubusercontent.com/jandrewtorres/0e40e6b3368af619a2287c1fa6508483/raw/a0661154081f625e6a74f672dd55db62a9dd8a5a/gym_crowdedness.csv"
 
-// the imported data will be stored in 'data'
-var data
 // the columns in the dataset will be needed later for calculations
 var columns = {}
 
-// import the dataset
-d3.csv(URL, function(error, d) {
-  if (error) throw error
-  data = d
-  // set up 'columns' object
-  d.columns.forEach(function(cName) {
-    columns[cName] = new Array()
-  })
-  // push values to 'columns object'
-  d.forEach(function(rows) {
-    d.columns.forEach(function(cName) {
-      columns[cName].push(parseFloat(rows[cName]))
-    })
+var getData = function(url) {
+  var re = new XMLHttpRequest()
+  re.open('GET', url, false)
+  re.send(null)
+  return re.response
+}
+
+var data = d3.csvParse(getData(URL))
+
+// configure columns
+Object.keys(data[0]).forEach((key) =>{
+  columns[key] = new Array()
+})
+
+data.forEach((row) => {
+  Object.keys(columns).forEach((key) => {
+    columns[key].push(Number(row[key]))
   })
 })
 
@@ -79,57 +82,10 @@ columns
 ## Wrangle the data and calculate correlation coefficients between features
 
 %% md
-We want to explore the correlations between the different columns. To do so, we will need to calculate the correlation coefficients with the following function, which accepts two feature columns as parameters and returns their Pearson Correlation Coefficient in the range [-1, 1]
+We want to explore the correlations between the different columns. To do so, we will need to calculate the correlation coefficients using jStat.corrcoeff() which accepts two feature columns as parameters and returns their Pearson Correlation Coefficient in the range [-1, 1]
 
-%% js
-/*
- *  Source: http://stevegardner.net/2012/06/11/javascript-code-to-calculate-the-pearson-correlation-coefficient/
- */
-function getPearsonCorrelation(x, y) {
-    var shortestArrayLength = 0;
-     
-    if(x.length == y.length) {
-        shortestArrayLength = x.length;
-    } else if(x.length > y.length) {
-        shortestArrayLength = y.length;
-        console.error('x has more items in it, the last ' + (x.length - shortestArrayLength) + ' item(s) will be ignored');
-    } else {
-        shortestArrayLength = x.length;
-        console.error('y has more items in it, the last ' + (y.length - shortestArrayLength) + ' item(s) will be ignored');
-    }
-  
-    var xy = [];
-    var x2 = [];
-    var y2 = [];
-  
-    for(var i=0; i<shortestArrayLength; i++) {
-        xy.push(x[i] * y[i]);
-        x2.push(x[i] * x[i]);
-        y2.push(y[i] * y[i]);
-    }
-  
-    var sum_x = 0;
-    var sum_y = 0;
-    var sum_xy = 0;
-    var sum_x2 = 0;
-    var sum_y2 = 0;
-  
-    for(var i=0; i< shortestArrayLength; i++) {
-        sum_x += x[i];
-        sum_y += y[i];
-        sum_xy += xy[i];
-        sum_x2 += x2[i];
-        sum_y2 += y2[i];
-    }
-  
-    var step1 = (shortestArrayLength * sum_xy) - (sum_x * sum_y);
-    var step2 = (shortestArrayLength * sum_x2) - (sum_x * sum_x);
-    var step3 = (shortestArrayLength * sum_y2) - (sum_y * sum_y);
-    var step4 = Math.sqrt(step2 * step3);
-    var answer = step1 / step4;
-  
-    return answer;
-}
+%% resource
+https://cdnjs.cloudflare.com/ajax/libs/jstat/1.7.1/jstat.min.js
 
 %% md
 Notice that the 'date' and 'timestamp' feature columns are continuous and will not give us meaningful correlations. Let's delete them.
@@ -146,18 +102,22 @@ var correlationCoefficients = {}
 
 Object.keys(columns).forEach(function(xColName) {
 	var xColumn = columns[xColName]
+    console.log(xColumn)
     correlationCoefficients[xColName] = new Array()
     Object.keys(columns).forEach(function(yColName) {
       var yColumn = columns[yColName]
-      correlationCoefficients[xColName].push(getPearsonCorrelation(xColumn, yColumn))
+      correlationCoefficients[xColName].push(jStat.corrcoeff(xColumn, yColumn))
     })
 })
+
+%% js
+correlationCoefficients
 
 %% md
 ## Visualize correlations using plotly.js heatmap
 
 %% md
-<div id='plot'></div>
+<div id="plot"></div>
 
 %% resource
 https://cdn.plot.ly/plotly-latest.min.js
@@ -176,8 +136,10 @@ var heatmapData = [
     z: zValues,
     x: Object.keys(correlationCoefficients),
     y: Object.keys(correlationCoefficients),
-    colorscale: 'Greens',
-    type: 'heatmap'
+    colorscale: 'RdBu',
+    type: 'heatmap',
+    zmin: -1,
+    zmax: 1,
   }
 ]
 
@@ -188,7 +150,11 @@ var layout = {
   },
 };
 
-Plotly.newPlot('plot', heatmapData, layout, { displayModeBar: false })
+function plotHeatmap() {
+  Plotly.newPlot('plot', heatmapData, layout, { displayModeBar: false })
+}
+
+plotHeatmap()
 
 %% md
 ## Heatmap / Correlation Coefficients Conclusions
@@ -369,13 +335,19 @@ plotSubPlot('byDuringSemester', [byDuringSemesterTrace], 'Is During Semester vs 
 plotSubPlot('byIsWeekend', [byIsWeekendTrace], 'Is Weekend vs Num People', 'Is Weekend', 'Num People')
 
 %% md
-## Analysis of feature group bys vs mean number of people graphs
+## Analysis of feature groups vs mean number of people graphs
 - More people go to the gym later in the day
 - There are more people in the gym when it is mild temperature outside, BUT the time of day and temperature have a relationship that is likely affecting this relationship
 - More people are in the gym at the start of the semester than the middle of the semester
 - More people are in the gym during the semester than not during the semester
-More people are in the gym during the week than weekend
+- More people are in the gym during the week than weekend
 - The average number of people in the gym steadily declines from Monday to Sunday
+
+%% md
+__original author__: John A. Torres (jandrewtorres) <br/>
+__contributors__: jandrewtorres <br/>
+__maintainer__: jandrewtorres <br/>
+__submission date__: 5/9/18 <br/>
 </script>
 <div id='page'></div>
 <script src='https://iodide-project.github.io/master/iodide.master.js'></script>
