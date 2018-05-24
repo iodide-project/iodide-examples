@@ -1,6 +1,6 @@
 # iodide-examples
 ### Start here:
-https://iodide-project.github.io/iodide-examples/what-a-web-notebook-looks-like.html
+[What a web notebook looks like](https://iodide-project.github.io/iodide-examples/what-a-web-notebook-looks-like.html)
 
 ### Then try these featured notebooks:
 - [The Lorenz Attractor](https://iodide-project.github.io/iodide-examples/lorenz-attractor-pres.html)
