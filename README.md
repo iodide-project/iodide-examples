@@ -1,6 +1,6 @@
 # iodide-examples
 ### Start here:
-https://iodide-project.github.io/iodide-examples/what-a-web-notebook-looks-like.html
+[What a web notebook looks like](https://iodide-project.github.io/iodide-examples/what-a-web-notebook-looks-like.html)
 
 ### Then try these featured notebooks:
 - [The Lorenz Attractor](https://iodide-project.github.io/iodide-examples/lorenz-attractor-pres.html)
@@ -17,7 +17,7 @@ Be sure to check out these two examples, which feature Python running _entirely 
 
 _Please let us know if you spot any errors!_ (An issue is great; A PR is ideal!)
 
-You can load an of the other notebooks in the repo by loading the url ` https://iodide-project.github.io/iodide-examples/{NOTEBOOK_NAME}`, but be aware that not all of them have recieved the same level of attention and some may be a bit rough.
+You can load an of the other notebooks in the repo by loading the url `https://iodide-project.github.io/iodide-examples/{NOTEBOOK_NAME}`, but be aware that not all of them have recieved the same level of attention and some may be a bit rough.
 
 # Contributing
 __Creating a demo and/or documentation notebookks is the best way to begin contributing to Iodide!__
@@ -38,6 +38,6 @@ Please test your notebooks on Firefox and Chrome.
 
 ### Inspiration
 
-"Data journalism" provides some of the very best sources of inspiration. Take a look at sites like www.fivethirtyeight.com, or the mix of visualization and explanation in things like this [interactive piece from the New York Times](https://www.nytimes.com/interactive/2017/11/28/upshot/what-the-tax-bill-would-look-like-for-25000-middle-class-families.html).
+"Data journalism" provides some of the very best sources of inspiration. Take a look at sites like [FiveThirtyEight](www.fivethirtyeight.com), or the mix of visualization and explanation in things like this [interactive piece from the New York Times](https://www.nytimes.com/interactive/2017/11/28/upshot/what-the-tax-bill-would-look-like-for-25000-middle-class-families.html).
 
 Of course, Iodide is directly inspired by Jupyter, so it's worth checking out [nbviewer](https://nbviewer.jupyter.org/) as another source of examples.
