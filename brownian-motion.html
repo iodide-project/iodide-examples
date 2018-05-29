@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Brownian Motion - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "Brownian Motion",
+  "viewMode": "presentation",
+  "lastSaved": "2018-05-29T15:03:27.167Z",
+  "lastExport": "2018-05-29T15:13:52.393Z"
+}
+
+%% md
+# Brownian Motion
+
+%% md
+So what is Brownian Motion? Is it something like Brownie in Motion?
+
+%% css
+brownie{
+position:relative;
+-webkit-animation:linear infinite alternate;
+-webkit-animation-name: run;
+-webkit-animation-duration: 5s;
+}     
+@-webkit-keyframes run {
+    0% { left: 0;}
+    50%{ left : 70%;}
+    100%{ left: 0;}
+}
+
+%% js
+iodide.output.element("brownie").innerHTML = '<img height="300" src="https://preview.ibb.co/kNWe7d/product_brownie.png" alt="product_brownie" border="0">'
+
+%% md
+Well not exactly! **Brownian motion** is the random motion of particles in liquid and air. What makes it more interesting is the fact that the study of Brownian Motion helped Scientists to verify the atomic hypothesis with a quantifiable measure to support it. In 1905 Einstein published his [paper](http://users.physik.fu-berlin.de/~kleinert/files/eins_brownian.pdf) which settled a dispute that had raged for nearly a century, and it placed kinetic theory on an experimental foundation. From this work, Newtonian physics, chemistry, and thermodynamics were connected.
+
+Brownian Motion occurs because large particles are bombarded by the other moving particles in the fluid. Larger particles can be moved by light, fast-moving molecules.
+
+The main result of Einstein's paper of 1905 on Brownian motion can be summarized as follows: the mean-square displacement `x^2` suffered by a spherical Brownian particle, of radius `a`, in time `t` is given by 
+
+$$
+< x^{2}> = (\frac{RT}{3\pi N_{av}a\eta})t
+$$
+
+where `T` is the temperature, `n` is the viscosity of the fluid, `R` is the gas constant and `N_av` is the Avogadro's number.
+
+[Jean Perrin](https://en.wikipedia.org/wiki/Jean_Baptiste_Perrin) made a quantitative experimental study of the dependence of Brownian motion on temperature and particle size that provided verification for Einstein's mathematical formulation. He was later awarded the Nobel Prize for Physics in 1926 for his work.
+
+To sum it up, Brownian Motion and its study were revolutionary because - 
+
+1. The Brownian motion observed under the microscope was first real proof of the existence of atoms and molecules.
+2. The kinetic theory of gases which explains the pressure, temperature and volume of gases are based on Brownian motion model of a particle.
+3. The mathematical model of Brownian motion has numerous real-world applications. For instance, [stock market fluctuations](https://en.wikipedia.org/wiki/Brownian_model_of_financial_markets) are often understood by this model.
+
+
+The below simulation illustrates the origin of Brownian motion, which is the random motion of particles suspended in a fluid due to collisions with the fast moving fluid particles or molecules. The violet trail shows the path of the particle.
+
+%% resource
+https://cdnjs.cloudflare.com/ajax/libs/d3/4.8.0/d3.min.js
+https://unpkg.com/d3-force-bounce@0.4/dist/d3-force-bounce.min.js
+https://unpkg.com/d3-force-surface@0.4/dist/d3-force-surface.min.js
+
+%% md
+Temperature:
+<input id="temperature-control" type="range" min="1" max="50" step="1" value="10" oninput="onTemperatureChange(this.value)">
+<span id="temperature-val">10</span>
+<button id="reset">Reset Path</button>
+
+<div style="position:relative">
+  <svg id="canvas"></svg>
+  <canvas id="historical" width="960" height="500" style="position: absolute; left: 0; top: 0; z-index: 1"></canvas>
+</div>
+
+%% js
+var GAS_DENSITY = 0.0005, // particles per sq px
+			NUM_DIFFUSERS = 5,
+			DIFFUSER_RADIUS = 40;
+var	TEMP = 10;
+
+var canvasWidth = 900,
+	canvasHeight = 500,
+	numGasParticles = Math.round(canvasWidth * canvasHeight * GAS_DENSITY),
+	svgCanvas = d3.select('svg#canvas')
+		.attr('width', canvasWidth)
+		.attr('height', canvasHeight);
+
+function randomVelocity(temp) {
+	// The Maxwell-Boltzman velocity distribution where temp is a renormalized temperature temp = kT/m
+	return d3.randomNormal(0, Math.sqrt(temp))();
+}
+
+var diffusers = d3.range(NUM_DIFFUSERS).map(() => {
+    return {
+        x: Math.random() * canvasWidth,
+        y: Math.random() * canvasHeight,
+        vx: 0,
+        vy: 0,
+        r: DIFFUSER_RADIUS
+    }
+});
+
+function generateParticles(temp) {
+
+	var gas = d3.range(numGasParticles).map(() => {
+		return {
+			x: Math.random() * canvasWidth,
+			y: Math.random() * canvasHeight,
+			vx: randomVelocity(temp),
+			vy: randomVelocity(temp),
+			r: 3
+		}
+	});
+
+	return diffusers.concat(gas);
+}
+
+var historicalContext = document.querySelector('#historical')
+  .getContext('2d', {alpha: true})
+
+historicalContext.lineWidth = 5
+historicalContext.strokeStyle = "rgba(128, 0, 255, 0.02)"
+
+document.querySelector('#reset').onclick = function() {historicalContext.clearRect(0, 0, canvasWidth, canvasHeight)}
+
+var forceSim = d3.forceSimulation()
+	.alphaDecay(0)
+	.velocityDecay(0)
+	.on('tick', particleDigest)
+	.force('bounce', d3.forceBounce()
+		.radius(d => d.r)
+	)
+	.force('container', d3.forceSurface()
+		.surfaces([
+			{from: {x:0,y:0}, to: {x:0,y:canvasHeight}},
+			{from: {x:0,y:canvasHeight}, to: {x:canvasWidth,y:canvasHeight}},
+			{from: {x:canvasWidth,y:canvasHeight}, to: {x:canvasWidth,y:0}},
+			{from: {x:canvasWidth,y:0}, to: {x:0,y:0}}
+		])
+		.oneWay(true)
+		.radius(d => d.r)
+	)
+	.nodes(generateParticles(TEMP));
+
+// Event handlers
+function onTemperatureChange(temp) {
+	d3.select('#temperature-val').text(temp);
+	var updatedParticles = forceSim.nodes().map(node => {
+		return node.r === DIFFUSER_RADIUS ? node : {
+			x: node.x,
+			y: node.y,
+			vx: node.vx * Math.sqrt(temp) / Math.sqrt(TEMP),
+			vy: node.vy * Math.sqrt(temp) / Math.sqrt(TEMP),
+			r: 3
+		};
+	})
+	forceSim.nodes(updatedParticles);
+	TEMP = temp;
+}
+
+function particleDigest() {
+
+	var particle = svgCanvas.selectAll('circle.particle').data(forceSim.nodes());
+
+	particle.exit().remove();
+
+	particle.merge(
+		particle.enter().append('circle')
+			.classed('particle', true)
+			.attr('r', d=>d.r)
+			.attr('fill', '#163143')
+	)
+		.attr('cx', d => d.x)
+		.attr('cy', d => d.y);
+    
+    historicalContext.beginPath()
+    for(var diffuser of diffusers) {
+      historicalContext.moveTo(diffuser.x, diffuser.y)
+      historicalContext.lineTo(diffuser.x + 1, diffuser.y + 1)
+    }
+    historicalContext.stroke()
+  
+}
+
+%% md
+To know more follow these references - 
+
+[https://www.ias.ac.in/article/fulltext/reso/010/09/0063-0078](https://www.ias.ac.in/article/fulltext/reso/010/09/0063-0078)  
+[https://en.wikipedia.org/wiki/Brownian_motion](https://en.wikipedia.org/wiki/Brownian_motion)  
+[http://galileo.phys.virginia.edu/classes/152.mf1i.spring02/BrownianMotion.htm](http://galileo.phys.virginia.edu/classes/152.mf1i.spring02/BrownianMotion.htm)
+
+%% js
+</script>
+<div id='page'></div>
+<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+</body>
+</html>
