@@ -10,8 +10,8 @@
 %% meta
 {
   "title": "Introduction to JavaScript for Python programmers",
-  "lastSaved": "2018-05-29T15:47:08.310Z",
-  "lastExport": "2018-05-29T15:47:10.229Z"
+  "lastSaved": "2018-05-31T14:53:38.100Z",
+  "lastExport": "2018-05-31T14:53:40.221Z"
 }
 
 %% md
@@ -100,7 +100,7 @@ Unlike Python, in JavaScript we need to define variables before then can be used
 
 Below is an example which shows how `var` doesn't have a block scope.
 
-_PS. As Iodide uses `let` and `const` under the hood to evaluate these cells, using them in the notebook would throw an error._
+_PS. In Iodide Notebooks you can use `let` and `const` only within a cell. Those variables won't be available to the global namespace as they don't escape the scope of the cell's "eval" block they are defined in._
 
 %% js
 var a = true;
@@ -112,7 +112,7 @@ b
 %% md
 ## Data Types
 
-As mentioned before JavaScript is dyanmaically typed language. A JS variable can contain any data type. So something as soon below is completely legit.
+As mentioned before JavaScript is dyanmaically typed language. A JS variable can contain any data type. So the code below, which changes the type of a variable, is completely legit.
 
 %% js
 var someString = "Hello there"
@@ -160,10 +160,10 @@ Triple equality (`===`) checks for equality without type conversions.
 
 The syntax for if-else ladder is as follow - 
 
-	if ( condition 1) {
+  if ( condition 1) {
       statement 1
     } else if (condition 2) {
-  	  statement 2
+      statement 2
     } else if (condition 3) {
       statement 3
     } else {
@@ -172,7 +172,7 @@ The syntax for if-else ladder is as follow -
     
 For loop takes the following form 
 
-	for (begin; condition; step) {
+  for (begin; condition; step) {
       // ... loop body ...
     }
     
@@ -225,7 +225,7 @@ Function Definition
     
 Function Expressions
 
-	var myFunc = function(args) {
+  var myFunc = function(args) {
        // do somethings
      }
      
@@ -355,8 +355,8 @@ The `try..catch` block will takes the following shape.
 
 %% js
 try {
-	var num = 1
-	num.toUpperCase()
+  var num = 1
+  num.toUpperCase()
   
 } catch (err) {
   iodide.output.text(err)
