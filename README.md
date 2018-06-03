@@ -13,7 +13,7 @@
 Be sure to check out these two examples, which feature Python running _entirely in the browser_, allowing portable and reproducible data science using Python _without having to install anything_!
 
 - [Hipster Band Finder](https://iodide-project.github.io/iodide-examples/hipster-band-finder.html)
-- [Pyiodide, Python on the Web](https://iodide-project.github.io/iodide-examples/python.html)
+- [Pyodide - Python on the Web](https://iodide-project.github.io/iodide-examples/python.html)
 
 _Please let us know if you spot any errors!_ (An issue is great; A PR is ideal!)
 
