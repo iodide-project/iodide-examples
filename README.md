@@ -5,7 +5,7 @@
 ### Then try these featured notebooks:
 - [The Lorenz Attractor](https://iodide-project.github.io/iodide-examples/lorenz-attractor-pres.html)
 - [World Happiness Report 2018](https://iodide-project.github.io/iodide-examples/world-happiness-report-2018.html)
-- [Eviction Notices by SF Neighborhood, 1999-2015](https://iodide-project.github.io/iodide-examples/eviction-notices-by-sf-neighborhood--1999-2015.html)
+- [Eviction Notices by SF Neighborhood, 1999-2015](https://iodide-project.github.io/iodide-examples/eviction-notices-sf.html)
 - [Gym Crowdedness](https://iodide-project.github.io/iodide-examples/gym-crowdedness.html)
 - [Visualizing Sorting Algorithms](https://iodide-project.github.io/iodide-examples/visualize-sorting-algorithms.html)
 - [Output Handling](https://iodide-project.github.io/iodide-examples/output-handling.html)
