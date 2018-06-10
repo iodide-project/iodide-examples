@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Introduction to JavaScript for Python programmers - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide.io/master/iodide.master.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "Introduction to JavaScript for Python programmers",
+  "lastSaved": "2018-05-31T14:53:38.100Z",
+  "lastExport": "2018-05-31T14:53:40.221Z"
+}
+
+%% md
+# Introduction to JavaScript
+
+Although there exist plenty of JavaScript tutorials on the web, they start by teaching the building blocks of programming. This is a fast paced tutorial aimed at individuals who already know Python or are comfortable with atleast one programming language.
+
+This tutorial introduces the basic concepts of JavaScript to get you started. Each of the sections below would be accompanied with some reference links in case you want to go deeper.
+
+%% md
+# What is JavaScript?
+
+JavaScript (or JS) is a programming language also deemed as the language of the web. At present JavaScript can execute not only in the browser, but also on the server, or actually on any device where there exists a special program called the JavaScript engine. JS is a dynamic language which is [weakly typed](https://en.wikipedia.org/wiki/Strong_and_weak_typing).
+
+JavaScript helps us to turn our ideas into code easily and to ship them without any issue due to their ubiquitous nature.
+
+The browser has a JavaScript engine inbuilt inside it which can be used to compile JS code. One can run JavaScript code using Browser console or on Iodide Notebooks 😄
+
+%% md
+## Key Differences
+
+Python and JavaScript are in fact not very dissimilar. Some of JavaScript's functionalities are directly inspired by Python. Here are some of the basic differences between the two languages. More details have been mentioned as we go along this tutorial.
+
+1. JS is a braces and semicolons language while Python is white-space and indent/block based*
+2. Python doesn't require an implicit variable declaration such as `var`
+3. Javascript and Python are both dynamically typed, whereas javascript is weakly, python strongly typed.
+4. In python, `self` is explicitly passed to a member function, and is not a special keyword or anything. In javascript, `this` is dynamically scoped and you can fiddle with the scope of a member function by calling `apply()` on it.
+5. JavaScript is a very forgiving language. You rarely run into errors. `undefined` keyword takes care of all nuances. In Python, exceptions are thrown.
+6. ~~You can run JS on a browser but not Python~~ Checkout [Python in Browser with Iodide](https://iodide-project.github.io/iodide-examples/python.html) 🎉
+
+\*Semicolons are optional in JavaScript to a certain extent. Read [Guide to Semicolons in JS](https://news.codecademy.com/your-guide-to-semicolons-in-javascript/) for more information1
+
+%% md
+# Fundamentals
+
+The contents of this tutorial have been aggregated from various sources. You can check them out if you face any difficulty  - 
+
+1. [JavaScript Info](http://javascript.info/)
+2. [Mozilla MDN](https://developer.mozilla.org/bm/docs/Web/JavaScript)
+3. [W3Schools](https://www.w3schools.com/js/)
+
+## Printing and Logging
+
+Python and other languages have a `print` method to display corresponding constants and variables. JavaScript has been designed in a different way for the purpose of serving the web. Natively, we can either use `console.log` method which will print the result in the browser's console or use `alert` which will show a popup window.
+
+%% js
+console.log("Hello")
+
+alert("Hi there")
+
+%% md
+The result of `console.log` will appear in your browser console. To open your browser console you can do :
+
+In Chrome
+
+    Windows: Ctrl + Shift + J
+    Mac OS: Cmd + Opt + J
+
+In Firefox
+
+    Windows: Ctrl + Shift + K
+    Mac OS: Cmd + Opt + K
+
+Luckily, Iodide offers a method to print the values of variables so that you don't have to open your console again and again for seeing the result.
+
+%% js
+var myVar = "Awesome"
+myVar
+
+%% js
+// By the way this is how you comment
+
+/* 
+For multiline you can 
+use this
+*/
+
+%% md
+## Variables
+
+Unlike Python, in JavaScript we need to define variables before then can be used. JavaScript offers three keywords to define variables `var`, `let` and `const`.
+
+`var` - Doesn't have block scope. They are either global or function-wide.  
+`let` - Modern way of declaring variables with lexical scope.  
+`const` - Similar to `let` but value of the variable can't be changed once declared
+
+Below is an example which shows how `var` doesn't have a block scope.
+
+_PS. In Iodide Notebooks you can use `let` and `const` only within a cell. Those variables won't be available to the global namespace as they don't escape the scope of the cell's "eval" block they are defined in._
+
+%% js
+var a = true;
+if (a) {
+  var b = "Hello"
+}
+b
+
+%% md
+## Data Types
+
+As mentioned before JavaScript is dynamically typed language. A JS variable can contain any data type. So the code below, which changes the type of a variable, is completely legit.
+
+%% js
+var someString = "Hello there"
+someString = 23
+
+someString
+
+%% md
+JS has 7 different data types - 
+
+`number` for numbers of any kind: integer or floating-point.  
+`string` for strings. A string may have one or more characters, there’s no separate single-character type.  
+`boolean` for true/false.  
+`null` for unknown values – a standalone type that has a single value null.  
+`undefined` for unassigned values – a standalone type that has a single value undefined.  
+`object` for more complex data structures.  
+`symbol` for unique identifiers.
+
+You can find the type of a variable using the keyword `typeof` which is both and operator and a function.  
+We can use it as `typeof var_name` or `typeof(var_name)`
+
+%% js
+someString = true
+typeof(someString)
+
+%% md
+## Operators
+
+The operators in JavaScript are pretty much the same with respect to other programming languages. Refer [http://javascript.info/operators](http://javascript.info/operators) to learn more.
+
+%% md
+## Comparisons
+
+We have nothing new here except triple equality. Comparison operators such as `<`, `>`, `<=` etc. work the same way.  
+Triple equality (`===`) checks for equality without type conversions.
+
+%% js
+1 == '1'
+
+%% js
+1 === '1'
+
+%% md
+## Flow Control and Loops
+
+The syntax for if-else ladder is as follow - 
+
+  if ( condition 1) {
+      statement 1
+    } else if (condition 2) {
+      statement 2
+    } else if (condition 3) {
+      statement 3
+    } else {
+      statement 4
+    }
+    
+For loop takes the following form 
+
+  for (begin; condition; step) {
+      // ... loop body ...
+    }
+    
+An example is shown below.
+
+%% js
+for (var i =0; i<5; i++) {
+  iodide.output.text(i)
+}
+
+%% md
+We have more loops like the `for..in` and `for..of` loop which we will discuss later.
+
+JavaScript also offers `while`, `do-while` loops along with the keywords `break` and `continue`.
+
+### Switch Case
+
+Switch Case is an alternate to multiple if statements. We will introduce the concept with an example.
+
+%% js
+var k = 3
+var result;
+
+switch (k) {
+  case 1: { result = 1; break}
+  case 2: { result = 2; break}
+  case 3: { result = 3; break}
+  case 4: { result = 4; break}
+  default: {result = 42}
+}
+result
+
+%% md
+The value of k is checked against each case with strict equality. If no match is found the default block is exectuted (if it exists). `break` is used for a very specific purpose. If the equality is found, switch starts to execute the code starting from the corresponding case, until the nearest break (or until the end of switch). In order to understand this in a better way, play around with the above code by removing the break statements.
+
+%% md
+## Functions
+
+Three way of defining functions in JavaScript. They are - 
+
+1. Function Declaration
+2. Function Expressions
+3. Arrow Functions
+
+Function Definition
+
+    function funcName(args) {
+        // do something
+    }
+    
+Function Expressions
+
+  var myFunc = function(args) {
+       // do somethings
+     }
+     
+Arrow Functions
+
+    var arrowFunc = (args) => {
+      // do something
+    }
+    
+
+Arrow functions are great for smaller functions. For example in single line functions return statements can be omitted. For this reason, they are quite similar to Lambda functions in python
+
+%% js
+var arrowFunc = (a,b) => a + b
+arrowFunc(2,4)
+
+%% md
+Function values can be copied to another variable as shown below.
+
+%% js
+var func = arrowFunc
+func(2,4)
+
+%% md
+# Objects
+
+Objects are similar to Python Dictionaries. In JavaScript, an object is a standalone entity, with properties and type. Compare it with a cup, for example. A cup is an object, with properties. A cup has a color, a design, weight, a material it is made of, etc. The same way, JavaScript objects can have properties, which define their characteristics.
+
+JavaScript comes with a lot predefined objects such as `Array`, `Map`, `Sets` etc. You can also create your own objects.
+
+%% js
+var myObject = {
+  name: 'Dhiraj',
+  age: 20
+}
+
+myObject
+
+%% js
+myObject.name
+
+%% js
+myObject["name"]
+
+%% md
+We can loop through objects using `for..in` loop.
+
+%% js
+for (var key in myObject) {
+  iodide.output.text(key)
+  iodide.output.text(myObject[key])
+}
+
+%% md
+You can add new keys by assigning value to `myObject.yourKey`
+
+%% js
+myObject.hello = function () {iodide.output.text("Hello")}
+myObject
+
+%% md
+Just like `self` in Python, JavaScript provides `this` keyword for accessing the information stored in its object. In JavaScript you don't have to explicitly pass `this` as an argument.
+
+%% js
+myObject.sayName = function() {iodide.output.text(this.name)}
+
+myObject.sayName()
+
+%% md
+`this` is often a puzzle for JavaScript programmers. To know more about `this` in depth check this answer from [StackOverflow](https://stackoverflow.com/a/3127440/2414789)
+
+%% md
+We have another keyword which is widely used with Objects - the `new` keyword. `new` allows the user to create similar objects easily. Infact functions are objects created using the `Function` constructor.
+
+%% js
+function User(name, age) {
+  this.name = name
+  this.age = age
+}
+
+var Harold = new User('Harold', 13)
+Harold
+
+%% md
+For more details on Objects, object inheritance and prototyping check [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain)
+
+%% md
+# Arrays
+
+Just like Python Lists, JavaScript has arrays for storing ordered data.
+
+%% js
+var arr = ['Hello', 2, "Apple"]
+arr
+
+%% js
+arr.length // Returns length of array
+
+%% js
+arr.push("Mango") // Appends element at the end
+iodide.output.text(arr)
+
+%% md
+`push` is an array method. Arrays have a number of methods which make our lives easier. You can read about them in detail at [W3Schools Array Reference](https://www.w3schools.com/Jsref/jsref_obj_array.asp).
+
+We can iterate over an array using the `for..of` loop.
+
+%% js
+for (var element of arr) {
+  iodide.output.text(element)
+}
+
+%% js
+arr[arr.length - 1] // Python equivalent for arr[-1]
+
+%% md
+# Error Handling
+
+Pythons `try..except` counterpart in JavaScript is `try..catch`. Consider the following erroneous code.
+
+%% js
+var num = 1
+num.toUpperCase()
+
+%% md
+The `try..catch` block will takes the following shape.
+
+%% js
+try {
+  var num = 1
+  num.toUpperCase()
+  
+} catch (err) {
+  iodide.output.text(err)
+}
+
+%% md
+You can also create Custom Errors. To know more see [http://javascript.info/custom-errors](http://javascript.info/custom-errors)
+
+%% md
+## What Next?
+
+In this tutorial we didn't cover how we can use JavaScript to manipulate Web Pages. Next, you should learn about Browser Events, Interfaces and the Document Object Model. [This resource](http://javascript.info/ui) does a great job explaining those concepts.
+</script>
+<div id='page'></div>
+<script src='https://iodide.io/master/iodide.master.js'></script>
+</body>
+</html>
