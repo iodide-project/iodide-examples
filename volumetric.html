@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>first shader - iodide</title>
+<link rel="stylesheet" type="text/css" href="iodide.dev.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "MRI notebook volumetric rendering",
+  "lastSaved": "2018-05-14T21:39:00.404Z",
+  "lastExport": "2018-05-14T21:39:04.942Z"
+}
+
+%% resource
+https://cdnjs.cloudflare.com/ajax/libs/three.js/88/three.min.js
+%% md 
+<div id="content">
+<h1 id="peering-into-the-unknown">Peering into the Unknown</h2>
+<p>Can you tell what I'm thinking right now? If you could you would know that I'm hoping I don't have to rewrite this introduction for the third time, but that would make you an uncommon individual. Most people don't have the ability to read someone's mind let alone the purely physical process of looking into another person's head. Those lucky enough to belong to the latter category probably have access to medical imaging technology and someone willing to crawl inside it. The rest of us -- at least for now -- must settle for looking inside my head.</p>
+<p>Briefly lets tangent into a light background on one particular sort of medical imaging known as MRI. MRI stands for Magnetic Resonance Imaging and you can see a cartoon of one scanner here. The parts of an MRI are roughly as follows: the patient table, which shifts the body part to be scanned into the center of the scanner; the magnetic and radiofrequency transmitter coils; radiofrequency receiver antenna coils.<br />
+
+<img src="https://drive.google.com/uc?export=view&id=1ZrwNFCjKlTkc-lC3uJLZSC3h3LkmHn3_" alt="machine" /></p>
+<p>When the superconducting electromagnet is turned on the hydrogen atoms in the magnetic field align along the axis running through the machine </p><img src="https://drive.google.com/uc?export=view&id=1G9f5lOPDgF5MK8n2ZtvtazEmviOpcow1" alt="machine on" />. 
+<p>The hydrogens are excited by the radio transmitter pulses and flip direction. The hydrogens return to their original direction and emit a radiofrequency signal that's picked up by the receivers within the scanner. </p>
+<img src="https://drive.google.com/uc?export=view&id=1H8BT1w0Od8NF1GyHNIT1G8v0bSYLRKpq" alt="Radio excitation" />
+<p>The tissue to which the hydrogen belongs influences the rate at which this happens and gives rise to Image contrast. </p>
+<img src="https://drive.google.com/uc?export=view&id=1EK5PS6T9PEnq_hZDqFejbiErzs2HTgdc" alt="Image Contrast" />
+</div>
+
+%% md
+
+	<body>
+		<div id="container">
+		</div>
+	</body>
+
+%% js
+var vShaderText = `
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+        attribute float displacement;
+        varying vec2 vUv;
+        varying vec3 worldcoords;
+        varying vec4 projcoords;
+        void main()
+        {
+            vUv =uv;
+            vec3 newPos = position;
+            //worldcoords = (modelViewMatrix*vec4(position + vec3(0.5,0.5,0.5),1.0)).xyz; //changed slightly from first pass
+            worldcoords =position; //changed slightly from first pass
+            projcoords =  projectionMatrix * modelViewMatrix * vec4(newPos,1.0);// this makes it screen coordinates
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos,1.0);
+        }
+
+`
+
+
+
+var fShaderText = `
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+        varying vec2 vUv;   
+        varying vec3 worldcoords;
+        varying vec4 projcoords;
+        uniform float shift;
+        uniform float scale;
+        uniform float xshift;
+        uniform sampler2D textyah;
+        uniform vec3 dir;
+        uniform float delta;
+        uniform float alphaCorrection;// not sure what alpha correction is
+        // lebarba code from github volumetric rendering
+        const int MAX_STEPS = 800;
+            // again lebarba code, but with some changes in the z indexing
+            //Acts like a texture3D using Z slices and trilinear filtering.
+
+        //cpos was originally -6.5 to 6.5
+        vec4 marcher(vec3 cpos) { // cpos is the current position
+                vec3 colorCoords = cpos + shift; // takes position makesonly positive
+                //transforms (13,13,13) to 0-1 ranges
+                colorCoords /=scale;
+
+                // convinced the problem is teh x
+                colorCoords.x += mod(floor(colorCoords.z*256.0),16.0); // 16 is the number of images on each axis
+                colorCoords.y += floor(colorCoords.z*256.0/16.0);
+                colorCoords/= 16.0;
+                vec4 colorSample = texture2D(textyah,colorCoords.xy);
+                return colorSample;
+        }
+        void main( void ) {
+                //!! I don't have the same setup for my alpha because I didn't alpha the background image
+                // worldcoords /16.0 will range 0-176 for height 0-240 for width a total of 256 slices so z will only go that high
+                // for each slice we have to move x up by 240 and after 16 of these go down (canvas is zero in top) 
+                //gl_FragColor  =vec4(colorCoords,1.0);
+                vec4 deepColor = vec4(0.0);// this is the total color through the cube
+                vec4 marchColor;// this is the color at part
+                float alphaSum;
+                //! unsure if this factor allows stepping through from all angles
+                const float mod_factor = sqrt(pow(13.0,2.0) + pow(13.0,2.0))/float(MAX_STEPS); // the sqrt part should be the longest len within the cube
+                vec3 pos = worldcoords;
+                vec3 mod_dir =normalize(pos -dir); // this may need to change depending on the direction we face
+                float dbg;
+                for (float i = 0.0; i < float(MAX_STEPS); i++) {
+                    // stop marchin at sides of cube
+                    if (pos.x < -6.5|| pos.x > 6.5||
+                        pos.y < -6.5|| pos.y > 6.5||
+                        pos.z < -6.5|| pos.z > 6.5 )  {
+                        break;
+                        }
+
+                    marchColor = marcher(pos);
+                    if (marchColor.r > .1) { // prevents the black from taking over too much
+                        alphaSum += marchColor.a*alphaCorrection;
+                        deepColor += marchColor*alphaCorrection;
+                    }
+                    pos += mod_dir*mod_factor;
+                }
+                gl_FragColor =vec4(deepColor.r,deepColor.g,deepColor.b,alphaSum);
+                //gl_FragColor= vec4(dbg,0,0,1);
+                //gl_FragColor= vec4(mod_dir,1);
+            }
+            `
+%% resource
+https://threejs.org/examples/js/controls/OrbitControls.js
+
+%% js
+        function changeScale (val) {
+            uniforms.scale.value = new THREE.Vector2(val,val)
+            uniforms.scale.value.needsUpdate = true
+        }
+var WIDTH = 800,
+    HEIGHT = 600;
+// set some camera attributes
+var VIEW_ANGLE = 45,
+    ASPECT = WIDTH / HEIGHT,
+    NEAR = 1,
+    FAR = 1000;
+// get the DOM element to attach to
+// - assume we've got jQuery to hand
+var container = document.getElementById('container');
+// create a WebGL renderer, camera
+// and a scene
+var renderer = new THREE.WebGLRenderer();
+var camera = new THREE.PerspectiveCamera(
+    VIEW_ANGLE,
+    ASPECT,
+    NEAR,
+    FAR  );
+var oC = new THREE.OrbitControls(camera,renderer.domElement)
+var scene_first_pass = new THREE.Scene();
+var scene_second_pass = new THREE.Scene();
+// the camera starts at 0,0,0 so pull it back
+// start the renderer
+renderer.setSize(WIDTH, HEIGHT);
+// attach the render-supplied DOM element
+container.append(renderer.domElement);
+var uniforms ={} 
+var w = 100,
+    h = 100,
+    wsegs= 1,
+    hsegs= 1,
+    halfh = h/2,
+    halfw = w/2
+var piecew = w/wsegs;
+var pieceh = h/hsegs;
+var uvs = []
+for (var iy = 0;iy < hsegs+1 ;iy++) {
+    for (var ix = 0;ix < wsegs+1;ix++) {
+        uvs.push(ix/wsegs)
+            uvs.push(1-(iy/hsegs))
+            }
+            }
+            var loader = new THREE.TextureLoader()
+            var geo
+
+            var boxDim = 13
+            var upscale = boxDim
+            var size =(boxDim)**3;
+            var dataDim = [2816,3840]
+            var totalDatapoints  =dataDim[0]*dataDim[1] 
+            var data = new Uint8Array(totalDatapoints);
+            console.log(size)
+
+            function rawFetch() {
+            //return fetch('https://dl.dropboxusercontent.com/s/tz54n279tg03vgb/flatbrain.raw?dl=0')
+            return fetch('./data/flatbrain.raw')
+            .then(function (res) {
+            return res.arrayBuffer()
+            })
+            .then(function(buf) {
+            return {buf}
+            })
+            }
+
+            var fetchdat = rawFetch()
+
+            fetchdat.then(function(obj) {
+            var arr = new Uint8Array(obj.buf)
+            texture = new THREE.DataTexture( arr, 240*16,176*16,THREE.LuminanceFormat, THREE.UnsignedByteType );
+            // create the sphere's material
+            // not sure yet why this is necessary, maybe backface tells us when to stop the marching?
+            // this connects the first pass and the second passes
+            rtTexture = new THREE.WebGLRenderTarget(HEIGHT,WIDTH,{ minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, wrapS:  THREE.ClampToEdgeWrapping, wrapT:  THREE.ClampToEdgeWrapping, type: THREE.FloatType, generateMipmaps: false} ); 
+
+uniforms.textyah = {type:'t',value:texture}
+uniforms.dir = {type:'v3',value:camera.position}
+uniforms.delta = {type:'1f',value: .01}
+uniforms.scale = {type:'1f',value:boxDim} // 733 is the ratio for the larger dimension to the smaller
+uniforms.xshift = {type:'1f',value:.5} 
+
+uniforms.scale.value.needsUpdate = true
+uniforms.alphaCorrection = {type:'1f',value: 0.0080 }
+uniforms.shift = {type:'1f',value:boxDim/2}
+uniforms.shift.value.needsUpdate = true
+var shaderMatSecondPass = new THREE.ShaderMaterial({
+    uniforms:uniforms,
+    vertexShader:   vShaderText,
+    fragmentShader: fShaderText,
+    side: THREE.FrontSide,
+    transparent:true
+
+})
+// create a new mesh with sphere geometry -
+    // we will cover the sphereMaterial next!
+    // create my uvs
+geo2 = new THREE.BoxBufferGeometry(boxDim,boxDim,boxDim)
+var boxmat = new THREE.MeshBasicMaterial({color:'blue'})
+var bufbox2= new THREE.Mesh(geo2,shaderMatSecondPass)
+// create axis tool to assist in sanity checks
+// x axis is red, y axis is green z is blue
+var axis = new THREE.AxesHelper(20)
+bufbox2.add(axis)
+//var bufbox2= new THREE.Mesh(geo2,boxmat)// sanity check for secondpass
+scene_second_pass.add(bufbox2);
+scene_second_pass.background = new THREE.Color('gray')
+uniforms.textyah.value.needsUpdate = true
+//scene_first_pass.add(camera);
+//scene_second_pass.add(camera);
+// create a rendering loop
+var frame = 0;
+//checking rendered textures
+//bufbox2.rotation.y += 2.5
+var range = 30
+camera.position.set(0,range,range)
+function update() {
+    frame += 1
+    //camera.position.x =Math.cos(frame * .01)*range; 
+    //camera.position.y =(Math.cos(frame * .01)*range + Math.sin(frame*.01)*range)/2; 
+    //camera.position.z =Math.sin(frame * .01)*range; 
+    camera.lookAt(new THREE.Vector3(0,0,0))
+    //bufbox2.rotation.z += .01
+    //bufbox2.rotation.x += .01
+    //renderer.render(scene_first_pass, camera,rtTexture,true);// this will make nothing appear on screen from first render
+    renderer.render(scene_second_pass,camera)
+    uniforms.textyah.value.needsUpdate = true
+    uniforms.dir = {type:'v3',value:camera.position}
+    //console.log(camera.position)
+    uniforms.dir.value.needsUpdate = true
+            requestAnimationFrame(update)
+            }
+            requestAnimationFrame(update)
+
+            })
+
+</script>
+<div id='page'></div>
+<script src='iodide.dev.js'></script>
+</body>
+</html>
