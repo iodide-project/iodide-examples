@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Brownian Motion - iodide</title>
-<link rel="stylesheet" type="text/css" href="https://iodide.io/master/iodide.master.css">
+<link rel="stylesheet" type="text/css" href="https://iodide.io/stable/iodide.stable.css">
 </head>
 <body>
 <script id="jsmd" type="text/jsmd">
@@ -177,26 +177,26 @@ function particleDigest() {
 	)
 		.attr('cx', d => d.x)
 		.attr('cy', d => d.y);
-    
+
     historicalContext.beginPath()
     for(var diffuser of diffusers) {
       historicalContext.moveTo(diffuser.x, diffuser.y)
       historicalContext.lineTo(diffuser.x + 1, diffuser.y + 1)
     }
     historicalContext.stroke()
-  
+
 }
 
 %% md
-To know more follow these references - 
+To know more follow these references -
 
-[https://www.ias.ac.in/article/fulltext/reso/010/09/0063-0078](https://www.ias.ac.in/article/fulltext/reso/010/09/0063-0078)  
-[https://en.wikipedia.org/wiki/Brownian_motion](https://en.wikipedia.org/wiki/Brownian_motion)  
+[https://www.ias.ac.in/article/fulltext/reso/010/09/0063-0078](https://www.ias.ac.in/article/fulltext/reso/010/09/0063-0078)
+[https://en.wikipedia.org/wiki/Brownian_motion](https://en.wikipedia.org/wiki/Brownian_motion)
 [http://galileo.phys.virginia.edu/classes/152.mf1i.spring02/BrownianMotion.htm](http://galileo.phys.virginia.edu/classes/152.mf1i.spring02/BrownianMotion.htm)
 
 %% js
 </script>
 <div id='page'></div>
-<script src='https://iodide.io/master/iodide.master.js'></script>
+<script src='https://iodide.io/stable/iodide.stable.js'></script>
 </body>
 </html>
