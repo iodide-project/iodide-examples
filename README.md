@@ -1,3 +1,8 @@
+___Note: this repository has been archived. Going forward, we'll be collecting examples and demos at the Iodide server instance hosted at iodide.io___
+
+--------
+
+
 # iodide-examples
 ### Start here:
 [What a web notebook looks like](https://iodide.io/iodide-examples/what-a-web-notebook-looks-like.html)
